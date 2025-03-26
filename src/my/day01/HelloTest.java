@@ -20,6 +20,7 @@ public class HelloTest {
     	String now1 = LocalDateTime.now().format(format);
     	Date now2 = new Date();
     	System.out.println(now1+"\n"+now2);
+    	
        
     }
 
