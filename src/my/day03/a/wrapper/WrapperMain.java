@@ -3,7 +3,6 @@ package my.day03.a.wrapper;
 import java.util.Scanner;
 
 public class WrapperMain {
-
 	public static void main(String[] args) {
 		char ch = 'f';
 		
@@ -19,7 +18,7 @@ public class WrapperMain {
 		else  System.out.println(ch+" 는 특수문자 입니다.");
 		
 		System.out.println("\n-----------------------------------------------------\n");
-		
+		//charAt 으로 특정 문자 가져오기
 		String str = "Baby";
 		System.out.println(str.charAt(0)); //B
 		
@@ -36,5 +35,4 @@ public class WrapperMain {
 		else if(result == ' ') System.out.println(result+ " 는 공백입니다.");
 		else  System.out.println(result+" 는 특수문자 입니다.");
 	}
-
 }
