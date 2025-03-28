@@ -24,5 +24,9 @@ public class ForGooGooDanMain {
 				System.out.printf("%d*%d=%d\t", j, i, j*i);
 			}
 		}
+		System.out.printf("%-30s%s\n", "======구구단====","테스트");// 30만큼 문자열 출력 빈공간엔 공백이 채워짐
+		//- 일시 뒤쪽에 채워짐
+		
+		
 	}
 }
