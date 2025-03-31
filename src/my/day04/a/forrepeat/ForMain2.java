@@ -1,5 +1,7 @@
 package my.day04.a.forrepeat;
 
+import java.util.UUID;
+
 public class ForMain2 {
 	public static void main(String[] args) {
 		
