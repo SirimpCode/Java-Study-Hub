@@ -7,6 +7,7 @@ import my.day01.MyUtil;
 
 public class RandomMain {
 	public static void main(String[] args) {
+		
 		double a= Math.random();
 		System.out.println(a);
 		//1부터 10까지의 수를 가져오려면

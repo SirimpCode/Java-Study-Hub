@@ -74,6 +74,7 @@ public class RockScissorsPaperMain {
 			
 		
 		}while(!myExit);
+		
 		sc.close();
 		System.out.println("==================종료===============");
 		
