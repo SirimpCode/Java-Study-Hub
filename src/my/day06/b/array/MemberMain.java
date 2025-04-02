@@ -98,7 +98,7 @@ public class MemberMain {
 					System.out.println(">> 현재 가입된 회원이 없습니다.\n");
 				for(int i=0;i< memberArr.length;i++) {
 					if(memberArr[i] != null) 
-						System.out.println(i+1+"번째 유저 => "+memberArr[i].getInfo());
+						System.out.println(i+1+"번째 유저 => "+memberArr[i].getInfo2());
 				}
 				break;
 			case "3" : break;
