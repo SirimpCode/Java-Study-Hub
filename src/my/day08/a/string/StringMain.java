@@ -49,8 +49,19 @@ public class StringMain {
 		//lastIndexOf를 활용
 		for(String path : pathFileNameArr) {
 			int index = path.lastIndexOf("/");
-			int t =  path.indexOf("/",15);
-			System.out.println(t);
+			System.out.println(path.substring(index+1));
+		}
+		System.out.println();
+		//그냥 indexOf
+		for(String path : pathFileNameArr) {
+			int index = 0;
+			for(int i = path.length()-1 ; i>=0; i-- ) {
+				if(path.charAt(i)=='/') {
+					index = i;
+					break;
+				}
+					
+			}
 			System.out.println(path.substring(index+1));
 		}
 	}
