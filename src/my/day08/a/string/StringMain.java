@@ -51,18 +51,22 @@ public class StringMain {
 			int index = path.lastIndexOf("/");
 			System.out.println(path.substring(index+1));
 		}
-		System.out.println();
-		//그냥 indexOf
+		
+		System.out.println("--------------------------------------------------------");//공백
+		//그냥 indexOf 활용 이번엔 확장자도 없애봤음
 		for(String path : pathFileNameArr) {
 			int index = 0;
+			int lastIndex = 0;
 			for(int i = path.length()-1 ; i>=0; i-- ) {
+				if(lastIndex == 0)
+					if(path.charAt(i)=='.')
+						lastIndex = i;
 				if(path.charAt(i)=='/') {
 					index = i;
 					break;
-				}
-					
+				}	
 			}
-			System.out.println(path.substring(index+1));
+			System.out.println(path.substring(index+1,lastIndex));
 		}
 	}
 

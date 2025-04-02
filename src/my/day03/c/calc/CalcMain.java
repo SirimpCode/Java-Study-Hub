@@ -32,6 +32,7 @@ public class CalcMain {
 			
 			
 			
+			
 			double result = 
 					switch(str) {
 						case "+" -> firstInt+secondInt ;
@@ -50,8 +51,10 @@ public class CalcMain {
 			
 		}catch(NumberFormatException e){
 			System.out.println(str + " 잘못입력됨");
+			sc.close();
 		}catch(Exception e) {
 			System.out.println(str + " 유효하지 않은 연산자");
+			sc.close();
 		}
 		sc.close();
 		
