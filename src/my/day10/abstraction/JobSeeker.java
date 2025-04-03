@@ -71,11 +71,29 @@ public class JobSeeker {
 	
 	private static int count;//구직자 객체 (인스턴스)의 개수 용도
 	
-	JobSeeker(){
+	
+	private String registerSetting() {
 		DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		this.registerDay = df.format(LocalDateTime.now());
+		return df.format(LocalDateTime.now());
+	}
+	public JobSeeker(String userId, String password, String name, String userPrimaryKey) {
+		this.userId = userId;
+		this.password = password;
+		this.name = name;
+		this.userPrimaryKey = userPrimaryKey;
+		this.gender = genderSetting(userPrimaryKey);
+		this.registerDay = registerSetting();
+		count++;
 	}
 	
+	private Gender genderSetting(String userPk) {
+		return switch(userPk.substring(7)) {
+		case "1","3" -> Gender.MAIL;
+		case "2", "4" -> Gender.FEMAIL;
+		default -> throw new StringIndexOutOfBoundsException("주민번호 뒷자의 성별 구분자가 잘못 입력됨");
+		};
+	}
+
 	//게터 메서드들
 	public static int getCount() {
 		return count;
@@ -95,7 +113,17 @@ public class JobSeeker {
 	public String getRegisterDay() {
 		return this.registerDay;
 	}
+	public String getGenderKor() {
+		return this.gender.kor;
+	}
+	public Gender getGender() {
+		return this.gender;
+	}
 	
+	//빌더
+	public static JobSeeker.Builder builder(){
+		return new JobSeeker.Builder();
+	}
 	public static class Builder{
 
 		private String userId;
@@ -104,7 +132,27 @@ public class JobSeeker {
 		// 주민번호인데 앞자리 6자리에 + 성별을 나타내는 1자리까지만 입력한다.
 	    // 예: "9506201"  "9607202"   "0006203"  "0007204"  "1106203"
 		private String userPrimaryKey; 
-		private String registerDay;
+
+		
+		public JobSeeker.Builder userId(String userId){
+			this.userId = userId;
+			return this;
+		}
+		public JobSeeker.Builder password(String password){
+			this.password = password;
+			return this;
+		}
+		public JobSeeker.Builder name(String name){
+			this.name = name;
+			return this;
+		}
+		public JobSeeker.Builder userPrimaryKey(String userPrimaryKey){
+			this.userPrimaryKey = userPrimaryKey;
+			return this;
+		}
+		public JobSeeker build() {
+			return new JobSeeker(this.userId, this.password, this.name, this.userPrimaryKey);
+		}
 	}
 	
 	public enum Gender {

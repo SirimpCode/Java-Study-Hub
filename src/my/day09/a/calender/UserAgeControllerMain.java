@@ -9,6 +9,8 @@ public class UserAgeControllerMain {
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
 		
+		
+		
 		while(true) {
 			System.out.print("계속 하시려면 아무키나 입력해주세요 (종료는 exit 입력) => ");
 			if(sc.nextLine().toLowerCase().equals("exit")) break;
