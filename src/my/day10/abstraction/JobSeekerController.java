@@ -3,6 +3,7 @@ package my.day10.abstraction;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -33,6 +34,15 @@ public class JobSeekerController {
 		String name = inputRepeat(sc, InputValue.NAME);
 		String userPk = inputRepeat(sc, InputValue.PRIMARY_KEY);
 		
+		jobSeekerList.add(
+				JobSeeker.builder()
+					.userId(id)
+					.password(password)
+					.userPrimaryKey(userPk.substring(2))
+					.name(name)
+					.build()
+		);
+		System.out.println("회원가입 완료 "+ name + "님 환영합니다.");
 	}
 	
 	
@@ -54,7 +64,7 @@ public class JobSeekerController {
 		return switch(iv) {
 			case ID -> {
 				while(true) {
-					System.out.print("1. 아이디 : ");
+					System.out.print("아이디 : ");
 					try {
 						yield validId(sc.nextLine());
 					}catch(Exception e) {
@@ -65,7 +75,7 @@ public class JobSeekerController {
 			}
 			case PASSWORD -> {
 				while(true) {
-					System.out.print("2. 패스워드 : ");
+					System.out.print("패스워드 : ");
 					try {
 						yield validPassword(sc.nextLine());
 					}catch(Exception e) {
@@ -76,7 +86,7 @@ public class JobSeekerController {
 			}
 			case NAME -> {
 				while(true) {
-					System.out.print("3. 이름 : ");
+					System.out.print("이름 : ");
 					try {
 						yield validName(sc.nextLine());
 					}catch(Exception e) {
@@ -87,7 +97,7 @@ public class JobSeekerController {
 			}
 			case PRIMARY_KEY -> {
 				while(true) {
-					System.out.print("4. 주민번호 앞 6자리와 뒤 1자리 : ");
+					System.out.print("주민번호 앞 6자리와 뒤 1자리 : ");
 					try {
 						yield validPk(sc.nextLine());
 					}catch(Exception e) {
@@ -98,29 +108,32 @@ public class JobSeekerController {
 			}
 		};
 	}
+	
+	private void userPkDateValid(String pk) {
+		int year = Integer.parseInt(pk.substring(0,4));
+		int month = Integer.parseInt(pk.substring(4,6));
+		int day = Integer.parseInt(pk.substring(6,8));
+		LocalDate.of(year, month, day);
+	}
+	
 	private String validPk(String pk) {
 		if(pk.length() != 7)
 			throw new StringIndexOutOfBoundsException("주민등록번호 앞 6자리와 뒤 1자리 총 7자리 숫자만 입력해주세요.");
 		try {
-			
-			
 			switch(pk.substring(pk.length()-1)) {
 				case "1","2" :  pk = String.join("", new String[] {"19",pk}); break;
 				case "3","4" :  pk = String.join("", new String[] {"20",pk}); break;
+				default : throw new IllegalAccessError("주민등록번호 뒷번호 앞자리는 1, 2, 3, 4 값중 하나여야 합니다.");
 			}
-			
-			Integer intBirth = Integer.parseInt(pk);
-			String birth = pk.substring(0, pk.length()-1);
-			LocalDate.of(birth.substring(0,4));
-			
-			
-			
+			userPkDateValid(pk);
+			return pk;	
 		}catch(Exception e){
 			if(e instanceof NumberFormatException)
 				throw new NumberFormatException("주민등록번호는 숫자만 입력해주세요.");
-			
+			if(e instanceof DateTimeParseException) 
+				throw new IllegalArgumentException("생년월일이 존재하지 않는 날짜 입니다.");
+			throw new RuntimeException(e.getMessage());
 		}
-		return pk;
 	}
 
 	private String validName(String name) {
@@ -161,5 +174,21 @@ public class JobSeekerController {
 		PASSWORD,
 		PRIMARY_KEY,
 		NAME;
+	}
+
+	public void getAllUserInfo() {
+		if(jobSeekerList.isEmpty()) {
+			System.out.println("가입 유저가 없습니다.");
+			return;
+		}
+		jobSeekerList.stream().forEach(
+				js-> System.out.println(js.getMyInfo())
+		);
+	}
+
+	public void findUserById(Scanner sc) {
+		String userId = inputRepeat(sc, InputValue.ID);
+		jobSeekerList.stream().filter(js-> js.getUserId().equals(userId))
+		.forEach(js-> System.out.println(js.getMyInfo()));
 	}
 }

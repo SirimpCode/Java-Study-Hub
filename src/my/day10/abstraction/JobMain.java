@@ -35,8 +35,10 @@ public class JobMain {
 					jsc.signUp(sc);
 					break;
 				case "2":  // 구직자 모두보기
+					jsc.getAllUserInfo();
 					break;
 				case "3": // 검색 하기
+					jsc.findUserById(sc);
 					break;
 				case "4": break main;
 				default : System.out.println("잘못 입력됨 1 부터 4 중 입력하세요.");

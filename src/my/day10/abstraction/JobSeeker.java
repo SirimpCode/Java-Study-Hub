@@ -87,11 +87,19 @@ public class JobSeeker {
 	}
 	
 	private Gender genderSetting(String userPk) {
-		return switch(userPk.substring(7)) {
+		return switch(userPk.substring(6)) {
 		case "1","3" -> Gender.MAIL;
 		case "2", "4" -> Gender.FEMAIL;
 		default -> throw new StringIndexOutOfBoundsException("주민번호 뒷자의 성별 구분자가 잘못 입력됨");
 		};
+	}
+	
+	private String replaceUserPk() {
+		return this.userPrimaryKey.substring(0,6)+"-"+this.userPrimaryKey.substring(6)+"******";
+	}
+	public String getMyInfo() {
+		
+		return "아이디 : "+this.userId+"	비밀번호 : "+this.password + "	이름 : "+this.name+	"	주민번호 : "+ replaceUserPk() + "	성별 : "+this.gender.kor + "	가입 날짜 : "+ this.registerDay;
 	}
 
 	//게터 메서드들
