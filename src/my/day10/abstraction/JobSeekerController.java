@@ -1,22 +1,28 @@
 package my.day10.abstraction;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.DuplicateFormatFlagsException;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 import javax.naming.NameNotFoundException;
 import javax.swing.text.DateFormatter;
 
+import my.day01.MyUtil;
+import my.day10.abstraction.JobSeeker.Gender;
+
 public class JobSeekerController {
 	List<JobSeeker> jobSeekerList = new ArrayList<>();
 	//메인메뉴 출력
 	public void mainMenu() {
-		System.out.println("\n === 메인메뉴 ===\n"
-				+ "1. 구직자 회원가입	2.구직자 모두보기	3.검색하기		4.프로그램 종료\n"
+		System.out.println("\n"+"=".repeat(40)+" 메인메뉴 "+"=".repeat(40)+"\n"
+				+ "1. 구직자 회원가입\t\t2.구직자 모두보기\t\t3.검색하기"+"\t\t4.탈퇴하기"+"\n\t\t\t\t5.프로그램 종료\n"
 				);
 		System.out.print("👉🏻 메뉴번호 선택 : ");
 		
@@ -29,10 +35,10 @@ public class JobSeekerController {
 			return;
 		}
 			
-		String id = inputRepeat(sc, InputValue.ID);
-		String password = inputRepeat(sc, InputValue.PASSWORD);
-		String name = inputRepeat(sc, InputValue.NAME);
-		String userPk = inputRepeat(sc, InputValue.PRIMARY_KEY);
+		String id = inputRepeat(sc, InputValue.ID,true);
+		String password = inputRepeat(sc, InputValue.PASSWORD,true);
+		String name = inputRepeat(sc, InputValue.NAME,true);
+		String userPk = inputRepeat(sc, InputValue.PRIMARY_KEY,true);
 		
 		jobSeekerList.add(
 				JobSeeker.builder()
@@ -47,26 +53,16 @@ public class JobSeekerController {
 	
 	
 	
-	private String idInputRepeat(Scanner sc) {
-		while(true) {
-			System.out.print("1. 아이디 : ");
-			try {
-				return validId(sc.nextLine());
-			}catch(Exception e) {
-				System.out.println(e.getMessage());
-				continue;
-			}
-		}
-	}
+	
 	
 	//유저의 입력을 반복 시켜주기 위한 메서드
-	private String inputRepeat(Scanner sc, InputValue iv) {
+	private String inputRepeat(Scanner sc, InputValue iv, boolean isSignUp) {
 		return switch(iv) {
 			case ID -> {
 				while(true) {
 					System.out.print("아이디 : ");
 					try {
-						yield validId(sc.nextLine());
+						yield validId(sc.nextLine(), isSignUp);
 					}catch(Exception e) {
 						System.out.println(e.getMessage());
 						continue;
@@ -130,9 +126,11 @@ public class JobSeekerController {
 		}catch(Exception e){
 			if(e instanceof NumberFormatException)
 				throw new NumberFormatException("주민등록번호는 숫자만 입력해주세요.");
-			if(e instanceof DateTimeParseException) 
+			if(e instanceof DateTimeException) 
 				throw new IllegalArgumentException("생년월일이 존재하지 않는 날짜 입니다.");
+			e.printStackTrace();
 			throw new RuntimeException(e.getMessage());
+		
 		}
 	}
 
@@ -156,11 +154,14 @@ public class JobSeekerController {
 	}
 
 	
-	private String validId(String id) throws NameNotFoundException {
+	private String validId(String id, boolean isSignUp) throws NameNotFoundException {
 		if(id.isBlank())
 			throw new IllegalArgumentException("아이디를 입력해주세요.");
 		if(id.length()<4||id.length()>8)
 			throw new StringIndexOutOfBoundsException("아이디는 4자 이상 8자 이하여야 합니다.");
+		if(existUserId(id) && isSignUp)
+			throw new DuplicateFormatFlagsException("이미 사용중인 아이디 입니다.");
+		
 		for(char ch : id.toCharArray()) {
 			if((ch>='a'&&ch<='z')||(ch>='A'&&ch<='Z')||(ch>='0'&&ch<='9'))
 				continue;
@@ -181,14 +182,162 @@ public class JobSeekerController {
 			System.out.println("가입 유저가 없습니다.");
 			return;
 		}
+		System.out.println("=".repeat(40)+" 모든 유저 조회 결과 "+"=".repeat(40));
+		printUserInfoGuide();
 		jobSeekerList.stream().forEach(
 				js-> System.out.println(js.getMyInfo())
 		);
+		printEndGuide();
+	}
+	
+	
+	private void printUserInfoGuide() {
+		System.out.println("아이디\t비밀번호\t\t이름\t주민번호\t\t\t만나이\t성별\t가입날짜");
+		System.out.println("-".repeat(96));
+	}
+	private void printEndGuide() {
+		System.out.println("-".repeat(96));
 	}
 
-	public void findUserById(Scanner sc) {
-		String userId = inputRepeat(sc, InputValue.ID);
-		jobSeekerList.stream().filter(js-> js.getUserId().equals(userId))
-		.forEach(js-> System.out.println(js.getMyInfo()));
+	private boolean existUserId(String id) {
+		return jobSeekerList.stream().filter(js-> js.getUserId().equals(id))
+				.findFirst().isPresent();
+	}
+	private void printUserInfoById(Scanner sc) {
+		String userId = inputRepeat(sc, InputValue.ID, false);
+		Optional<JobSeeker> userOp = findUserById(userId);
+		if(userOp.isPresent()) {
+			printUserInfoGuide();
+			System.out.println(userOp.get().getMyInfo()); 
+			printEndGuide();
+			return;
+		}
+		System.out.println("입력하신 아이디의 유저가 없습니다.");
+	}
+	
+	private Optional<JobSeeker> findUserById(String id) {
+		return jobSeekerList.stream().filter(js->js.getUserId().equals(id))
+				.findFirst();
+	}
+
+	public void withdrawUser(Scanner sc) {
+		String id = inputRepeat(sc,InputValue.ID,false);
+		String password = inputRepeat(sc,InputValue.PASSWORD,false);
+		Optional<JobSeeker> userOp = findUserById(id);
+		if(userOp.isEmpty()) {
+			System.out.println("해당 아이디로 가입된 유저가 없습니다.");
+			return;
+		}
+		JobSeeker user = userOp.get();
+		if(!user.getPassword().equals(password)) {
+			System.out.println("비밀번호가 틀렸습니다.");
+			return;
+		}
+		if(jobSeekerList.remove(user))
+			System.out.println("유저 탈퇴 성공");;
+		
+	}
+
+	public void searchUser(Scanner sc) {
+		while(true) {
+//			if(jobSeekerList.isEmpty()) {
+//				System.out.println("가입된 유저가 없습니다."); return;
+//			}
+			System.out.println("1. 연령대 검색\t2. 성별 검색\t3.아이디 검색\t4. 메인 메뉴로 돌아가기");
+			String select = sc.nextLine();
+			switch(select) {
+				case "1" : searchUserAge(sc); break;
+				case "2" : searchUserByGender(sc); break;
+				case "3" : printUserInfoById(sc); break;
+				case "4" : return;
+				default : System.out.println("잘못 입력됨 1 부터 4 중에 입력 해주세요.");
+			}
+		}
+		
+		
+	}
+	
+	
+	private void searchUserByGender(Scanner sc) {
+		boolean repeat = true;
+		do {
+			System.out.println("검색하실 성별 남성 혹은 여성을 입력하세요.");
+			String gender = sc.nextLine();
+			switch(gender) {
+				case "남성" :
+				case "여성" :  
+					printUserInfoByGender(gender);
+					repeat = false;
+					break;
+					
+				default : System.out.println("잘못 입력됨 남성 혹은 여성만 입력하세요.\n");
+			}
+			
+			
+		}while(repeat);
+		
+	}
+
+	private void printUserInfoByGender(String genderStr) {
+		JobSeeker.Gender gender = MyUtil.getEnumValue(JobSeeker.Gender.class, genderStr);
+		List<JobSeeker> userList = findUserByGender(gender);
+		if(!userList.isEmpty()) {
+			userList.stream().forEach(ul->
+				System.out.println(ul.getMyInfo()));
+			return;
+		}
+		System.out.println(genderStr+ "으로 조회된 유저가 없습니다.");
+	}
+
+	private List<JobSeeker> findUserByGender(Gender gender) {
+		// TODO 자동 생성된 메소드 스텁
+		return jobSeekerList.stream().filter(js->js.getGender().equals(gender)).toList();
+	}
+
+	private void searchUserAge(Scanner sc) {
+		boolean repeat = true;
+		do {
+			System.out.println("검색 하고자 하는 연령대 [예 : 20] => ");
+			String age = sc.nextLine();
+			switch(age) {
+				case "0" : 
+				case "20" :
+				case "30" :
+				case "10" :
+				case "40" :
+				case "50" :
+				case "60" :
+				case "70" :
+				case "80" : 
+					printUserByAge(age);
+					repeat = false;
+				break;
+			default : 
+				System.out.println("잘못 입력됨 올바른 연령대를 입력해주세요.\n");
+			}
+		}while(repeat);
+		
+	}
+
+	private void printUserByAge(String age) {
+		List<JobSeeker> userList = ageFilterUser(age);
+		if(userList.isEmpty()) {
+			System.out.println(age+"대의 유저가 없습니다.");
+			return;
+		}
+		printUserInfoGuide();
+		userList.stream().forEach(
+				js-> System.out.println(js.getMyInfo())
+		);
+		printEndGuide();
+	}
+	private List<JobSeeker> ageFilterUser(String age){
+		int ageInt = Integer.parseInt(age);
+		int maxAge = Integer.parseInt(String.join("", new String[] {age.substring(0,1),"9"}));
+		return jobSeekerList.stream().filter(js->{
+			int myAge = MyUtil.getAge(js.getUserPrimaryKey());
+			
+			return ageInt<=myAge&&maxAge>=myAge;
+			}).toList();
 	}
 }

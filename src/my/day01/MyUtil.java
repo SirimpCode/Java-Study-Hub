@@ -3,9 +3,15 @@ package my.day01;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.EnumSet;
 import java.util.Random;
 
 import javax.management.RuntimeErrorException;
+import javax.naming.NameNotFoundException;
+import javax.security.auth.login.AccountNotFoundException;
+
+import my.day10.abstraction.EnumInterface;
+import my.day10.abstraction.JobSeeker;
 
 public class MyUtil {
 	public static String currentTime() {
@@ -113,6 +119,13 @@ public class MyUtil {
 		case GENDER -> Integer.parseInt(userPk.substring(6));
 		};	
 		
+	}
+	public static <T extends Enum<T>&EnumInterface> T getEnumValue(Class<T> enumClass,String str){
+		for(T myEnum : EnumSet.allOf(enumClass)) {
+			if(myEnum.getValue().equals(str))
+				return myEnum;
+		}
+		throw new NullPointerException("이넘값을 찾을 수 없습니다.");
 	}
 	
 	// 성별과 주민번호의 enum 클래스

@@ -3,6 +3,8 @@ package my.day10.abstraction;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import my.day01.MyUtil;
+
 /*
 ==== *** 객체지향 프로그래밍(Object Oriented Programming)이란? *** ==== 
 
@@ -97,9 +99,14 @@ public class JobSeeker {
 	private String replaceUserPk() {
 		return this.userPrimaryKey.substring(0,6)+"-"+this.userPrimaryKey.substring(6)+"******";
 	}
+	
+	private String maskingPassword() {
+		
+		return password.substring(0,3)+"*".repeat(password.length()-3);
+	}
 	public String getMyInfo() {
 		
-		return "아이디 : "+this.userId+"	비밀번호 : "+this.password + "	이름 : "+this.name+	"	주민번호 : "+ replaceUserPk() + "	성별 : "+this.gender.kor + "	가입 날짜 : "+ this.registerDay;
+		return this.userId+"\t"+maskingPassword()+ "\t"+this.name+	"\t"+ replaceUserPk() +"\t\t"+MyUtil.getAge(userPrimaryKey)+ "\t"+this.gender.kor + "\t"+ this.registerDay;
 	}
 
 	//게터 메서드들
@@ -163,12 +170,15 @@ public class JobSeeker {
 		}
 	}
 	
-	public enum Gender {
+	public enum Gender implements EnumInterface {
 		MAIL("남성"),
 		FEMAIL("여성");
 		private final String kor;
 		Gender(String kor){
 			this.kor = kor;
+		}
+		public String getValue() {
+			return this.kor;
 		}
 	}
 	
