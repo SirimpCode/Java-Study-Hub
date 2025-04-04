@@ -1,6 +1,7 @@
 package my.day01;
 
 import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.EnumSet;
@@ -10,8 +11,9 @@ import javax.management.RuntimeErrorException;
 import javax.naming.NameNotFoundException;
 import javax.security.auth.login.AccountNotFoundException;
 
-import my.day10.abstraction.EnumInterface;
-import my.day10.abstraction.JobSeeker;
+import my.day11.inheritance.EnumInterface;
+import my.day11.inheritance.JobSeeker.UserFieldEnum;
+
 
 public class MyUtil {
 	public static String currentTime() {
@@ -94,8 +96,6 @@ public class MyUtil {
 		LocalDate now = LocalDate.now();
 		LocalDate user = LocalDate.of(year, month, day);
 		
-		
-		
 		return now.isBefore(user.withYear(now.getYear())) ?
 				now.getYear() - user.getYear() - 1 : now.getYear() - user.getYear();
 	}
@@ -128,6 +128,17 @@ public class MyUtil {
 		throw new NullPointerException("이넘값을 찾을 수 없습니다.");
 	}
 	
+	
+	public static boolean validationUserField(UserFieldEnum myEnum, String value) {
+		return switch(myEnum) {
+			case ID -> value.matches("^[A-Za-z][A-Za-z0-9]{3,9}");
+			case PASSWORD -> value.matches("^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[!@#$%^&*()-+=]).{8,16}$");
+			case PRIMARY_KEY -> value.matches("^[0-9]{7,7}");
+			case NAME -> value.matches("^[가-힣]{2,7}");
+		};
+	}
+	
+	
 	// 성별과 주민번호의 enum 클래스
 	private static enum Gender {
 		OLDMALE,
@@ -142,5 +153,7 @@ public class MyUtil {
 		DAY,
 		GENDER;
 	}
+
+	
 	
 }
