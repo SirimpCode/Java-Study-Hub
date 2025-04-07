@@ -1,5 +1,6 @@
 package my.day01;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 
 import java.time.LocalDateTime;
@@ -82,16 +83,12 @@ public class MyUtil {
 	public static int getAge(String userPk) {
 		if(userPk.length() != 7)
 			throw new StringIndexOutOfBoundsException("7자리의 숫자만 입력하세요");
-		int genderInt = getPkParseInt(MyPkEnum.GENDER, userPk);
-		Gender gender = parseGenderInt(genderInt);
-		int year = getPkParseInt(MyPkEnum.YEAR, userPk);
+		
+		Gender gender = createGender(userPk);
+		
 		int month = getPkParseInt(MyPkEnum.MONTH, userPk);
 		int day = getPkParseInt(MyPkEnum.DAY, userPk);
-		
-		year += switch(gender) {
-		case OLDMALE,OLDFEMALE -> 1900;
-		case MALE,FEMALE -> 2000;
-		};
+		int year = pasingYear(userPk, gender);
 		
 		LocalDate now = LocalDate.now();
 		LocalDate user = LocalDate.of(year, month, day);
@@ -99,6 +96,20 @@ public class MyUtil {
 		return now.isBefore(user.withYear(now.getYear())) ?
 				now.getYear() - user.getYear() - 1 : now.getYear() - user.getYear();
 	}
+	private static Gender createGender(String userPk) {
+		
+		int genderInt = getPkParseInt(MyPkEnum.GENDER, userPk);
+		return parseGenderInt(genderInt);
+	}
+	private static int pasingYear(String userPk,Gender gender) {
+		int year = getPkParseInt(MyPkEnum.YEAR, userPk);
+		return switch(gender) {
+		case OLDMALE,OLDFEMALE -> 1900+year;
+		case MALE,FEMALE -> 2000+year;
+		};
+	}
+	
+	
 	//주민번호 뒷자리의 앞숫자를 Gender 타입으로 파싱 메서드
 	private static Gender parseGenderInt(int genderInt) {
 		return switch(genderInt) {
@@ -133,7 +144,22 @@ public class MyUtil {
 		return switch(myEnum) {
 			case ID -> value.matches("^[A-Za-z][A-Za-z0-9]{3,9}");
 			case PASSWORD -> value.matches("^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[!@#$%^&*()-+=]).{8,16}$");
-			case PRIMARY_KEY -> value.matches("^[0-9]{7,7}");
+			case PRIMARY_KEY -> {
+				if(value.matches("^[0-9]{7,7}")) {
+					try {
+						Gender gender = createGender(value);
+						int year = pasingYear(value, gender);
+						int month = getPkParseInt(MyPkEnum.MONTH, value);
+						int day = getPkParseInt(MyPkEnum.DAY, value);;
+						LocalDate.of(year, month, day);
+					}catch(Exception e) {
+						yield false;
+					}
+					yield true;
+				};
+				yield false;
+				
+			}
 			case NAME -> value.matches("^[가-힣]{2,7}");
 		};
 	}

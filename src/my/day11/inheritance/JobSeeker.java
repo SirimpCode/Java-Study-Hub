@@ -12,10 +12,20 @@ public class JobSeeker extends CommonMember{
 	
 	private static int count;
 	
+	public void setUserPrimaryKey(String pk) {
+		this.userPrimaryKey = pk;
+	}
 	
 	private JobSeeker(JobSeeker.Builder builder) {
 		super(builder);
 		this.userPrimaryKey = builder.userPrimaryKey;
+		try {
+			if(!(MyUtil.validationUserField(UserFieldEnum.PRIMARY_KEY, userPrimaryKey)))
+				throw new RuntimeException("주민등록번호 유효성 검사 실패");
+		}catch(NullPointerException e) {
+			throw new RuntimeException("주민등록번호값은 필수 입니다.");
+		}
+		
 		this.gender = createGenderByUserPk(builder.userPrimaryKey);
 		count++;
 	}
@@ -32,13 +42,12 @@ public class JobSeeker extends CommonMember{
 		return this.userPrimaryKey.substring(0,6)+"-"+this.userPrimaryKey.substring(6)+"******";
 	}
 	
-	private String maskingPassword() {
-		String password = super.getPassword();
-		return password.substring(0,3)+"*".repeat(password.length()-3);
-	}
-	public String getMyInfo() {
+	public String getMyInfo(boolean masking) {
 		
-		return super.getId()+"\t"+maskingPassword()+ "\t"+super.getName()+	"\t"+ replaceUserPk() +"\t\t"+MyUtil.getAge(userPrimaryKey)+ "\t"+this.gender.getValue() + "\t"+ super.getRegisterDay();
+		return masking?
+				super.getId()+"\t"+super.maskingPassword()+ "\t"+super.getName()+	"\t"+ replaceUserPk() +"\t\t"+MyUtil.getAge(userPrimaryKey)+ "\t"+this.gender.getValue() + "\t"+ super.getRegisterDay() :
+					super.getId()+"\t"+super.getPassword()+ "\t"+super.getName()+	"\t"+ replaceUserPk() +"\t\t"+MyUtil.getAge(userPrimaryKey)+ "\t"+this.gender.getValue() + "\t"+ super.getRegisterDay();
+					
 	}
 
 	//게터 메서드들
