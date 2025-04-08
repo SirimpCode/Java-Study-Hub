@@ -1,5 +1,6 @@
 package my.day11.inheritance;
 
+import java.text.DecimalFormat;
 import java.time.DateTimeException;
 
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import javax.naming.NameNotFoundException;
 import javax.swing.text.DateFormatter;
 
 import my.day01.MyUtil;
+import my.day11.inheritance.Company.CompanyFieldEnum;
 import my.day11.inheritance.JobSeeker.UserFieldEnum;
 
 public class JobSeekerController {
@@ -415,18 +417,6 @@ public class JobSeekerController {
 		return jobSeekerList.stream().filter(js-> js.getId().equals(id))
 				.findFirst().isPresent();
 	}
-	private void printUserInfoById(Scanner sc) {
-		String userId = inputRepeat(sc, JobSeeker.UserFieldEnum.ID, false);
-		Optional<JobSeeker> userOp = findUserById(userId);
-		if(userOp.isPresent()) {
-			printUserInfoGuide();
-			System.out.println(userOp.get().getMyInfo(true)); 
-			printEndGuide();
-			return;
-		}
-		System.out.println("입력하신 아이디의 구직자가 없습니다.");
-	}
-	
 	private Optional<JobSeeker> findUserById(String id) {
 		return jobSeekerList.stream().filter(js->js.getId().equals(id))
 				.findFirst();
@@ -458,47 +448,85 @@ public class JobSeekerController {
 			System.out.println("1.연령대 검색\t2.성별 검색\t3.아이디 검색\t4.나이와 성별로 검색\t5.이전 메뉴로 돌아가기");
 			String select = sc.nextLine().trim();
 			switch(select) {
-				case "1" : searchUserAge(sc); break;
-				case "2" : searchUserByGender(sc); break;
-				case "3" : printUserInfoById(sc); break;
-				case "4" : searchUserByAgeAndGender(sc); break;
+				case "1" : searchJobSeekerByAge(sc); break;
+				case "2" : searchJobSeekerByGender(sc); break;
+				case "3" : searchJobSeekerById(sc); break;
+				case "4" : searchJobSeekerByAgeAndGender(sc); break;
 				case "5" : return;
 				default : System.out.println("잘못 입력됨 1 부터 5 중에 입력 해주세요.");
 			}
 		}
-		
-		
 	}
-	
-	public void searchUserByAgeAndGender(Scanner sc) {
-		String age = repeatAge(sc);
-		String genderStr = repeatGender(sc);
-		
-		List<JobSeeker> userListByAge = ageFilterUser(age);
-		Gender gender = MyUtil.getEnumValue(Gender.class, genderStr);
-		
-		
-		if(userListByAge.isEmpty()) {
-			System.out.println(age+"대의 구직자가 없습니다."); return;
-		}
-			
-		List<JobSeeker> resultList = userListByAge.stream()
-				.filter(ua->ua.getGender().equals(gender)).toList();
-		if(resultList.isEmpty()) {
-			System.out.println(age+"대의 "+genderStr+" 구직자가 없습니다."); return;
-		}
+	private void printJobSeekerInfo(List<JobSeeker> jobSeekers) {
 		printUserInfoGuide();
-		resultList.stream().forEach(r->System.out.println(r.getMyInfo(true)));
+		jobSeekers.stream().forEach(js->System.out.println(js.getMyInfo(true)));
 		printEndGuide();
 	}
-	
-	private void searchUserByGender(Scanner sc) {
-		String gender = repeatGender(sc);
-		printUserInfoByGender(gender);
+	private List<JobSeeker> findJobSeekerByAge(String age){
+		int ageInt = Integer.parseInt(age);
+		int maxAge = Integer.parseInt(String.join("", new String[] {age.substring(0,1),"9"}));
+		
+
+		System.out.println("["+age+"대] 의 구직자를 검색합니다.");
+		return jobSeekerList.stream().filter(js->{
+			int myAge = MyUtil.getAge(js.getUserPrimaryKey());
+			
+			return ageInt<=myAge&&maxAge>=myAge;
+			}).toList();
 	}
+	private List<JobSeeker> findJobSeekerByGender(String genderStr) {
+		Gender gender = MyUtil.getEnumValue(Gender.class, genderStr);
+		System.out.println("["+genderStr+"] 인 구직자를 검색합니다.");
+		return jobSeekerList.stream().filter(js->js.getGender().equals(gender)).toList();
+	}
+	private void searchJobSeekerByAgeAndGender(Scanner sc) {
+		System.out.println("연령대와 성별로 검색합니다.");
+		System.out.println("검색 하실 연령대를 입력해주세요. ex) 20");
+		String age = repeatAge(sc);
+		List<JobSeeker> ageJsList = findJobSeekerByAge(age);  
+		System.out.println("검색 하실 구직자의 성별을 남성 혹은 여성으로 입력해주세요.");
+		String genderStr = repeatGender(sc);
+		Gender gender = MyUtil.getEnumValue(Gender.class, genderStr);
+		System.out.println("["+age+"대]의 구직자 검색 결과에서 ["+genderStr+"] 구직자를 검색합니다.");
+		List<JobSeeker> resultList = ageJsList.stream().filter(aj->aj.getGender().equals(gender)).toList();
+		
+		if(!resultList.isEmpty()) printJobSeekerInfo(resultList);
+		else System.out.println("["+age+"대]의 ["+genderStr+"] 인 구직자가 없습니다.");
+	}
+	private void searchJobSeekerByGender(Scanner sc) {
+		System.out.println("검색 하실 구직자의 성별을 남성 혹은 여성으로 입력해주세요.");
+		String gender = repeatGender(sc);
+		
+		List<JobSeeker> resultList = findJobSeekerByGender(gender);
+		if( !resultList.isEmpty() ) printJobSeekerInfo(resultList);
+		else System.out.println("["+gender+"] 인 구직자가 없습니다.");
+	}
+	
+	private void searchJobSeekerById(Scanner sc) {
+		System.out.println("검색 하실 구직자 아이디를 입력해주세요.");
+		String id = inputRepeat(sc, UserFieldEnum.ID, false);
+		
+
+		System.out.println("["+id+"] 아이디의 구직자를 검색합니다.");
+		Optional<JobSeeker> result = findUserById(id);
+		if (result.isPresent()) printJobSeekerInfo(List.of(result.get()));
+		else System.out.println("["+id+"] 아이디의 구직자가 없습니다.");
+	}
+	
+	private void searchJobSeekerByAge(Scanner sc) {
+		System.out.println("검색 하실 연령대를 입력해주세요. ex) 20");
+		String age = repeatAge(sc);
+		
+		List<JobSeeker> resultList = findJobSeekerByAge(age);
+		if( !resultList.isEmpty() ) printJobSeekerInfo(resultList);
+		else System.out.println("["+age+"대] 의 구직자가 없습니다.");
+	}
+	
+	
+	
+	
 	private String repeatGender(Scanner sc) {
 		while(true) {
-			System.out.println("검색하실 성별 남성 혹은 여성을 입력하세요.");
 			String gender = sc.nextLine().trim();
 			switch(gender) {
 				case "남성" :
@@ -508,31 +536,8 @@ public class JobSeekerController {
 			}
 		}
 	}
-
-	private void printUserInfoByGender(String genderStr) {
-		Gender gender = MyUtil.getEnumValue(Gender.class, genderStr);
-		List<JobSeeker> userList = findUserByGender(gender);
-		if(!userList.isEmpty()) {
-			printUserInfoGuide();
-			userList.stream().forEach(user->
-				System.out.println(user.getMyInfo(true)));
-			printEndGuide();
-			return;
-		}
-		System.out.println(genderStr+ "으로 조회된 구직자가 없습니다.");
-	}
-
-	private List<JobSeeker> findUserByGender(Gender gender) {
-		return jobSeekerList.stream().filter(js->js.getGender().equals(gender)).toList();
-	}
-
-	private void searchUserAge(Scanner sc) {
-		String age = repeatAge(sc);
-		printUserByAge(age);
-	}
 	private String repeatAge(Scanner sc) {
 		while(true) {
-			System.out.println("검색 하고자 하는 연령대 [예 : 20] => ");
 			String age = sc.nextLine().trim();
 			switch(age) {
 				case "0" : 
@@ -549,28 +554,5 @@ public class JobSeekerController {
 				System.out.println("잘못 입력됨 올바른 연령대를 입력해주세요.\n");
 			}
 		}
-	}
-
-	private void printUserByAge(String age) {
-		List<JobSeeker> userList = ageFilterUser(age);
-		if(userList.isEmpty()) {
-			System.out.println(age+"대의 구직자가 없습니다.");
-			return;
-		}
-		printUserInfoGuide();
-		userList.stream().forEach(
-				js-> System.out.println(js.getMyInfo(true))
-		);
-		printEndGuide();
-	}
-	private List<JobSeeker> ageFilterUser(String age){
-		int ageInt = Integer.parseInt(age);
-		int maxAge = Integer.parseInt(String.join("", new String[] {age.substring(0,1),"9"}));
-		
-		return jobSeekerList.stream().filter(js->{
-			int myAge = MyUtil.getAge(js.getUserPrimaryKey());
-			
-			return ageInt<=myAge&&maxAge>=myAge;
-			}).toList();
 	}
 }

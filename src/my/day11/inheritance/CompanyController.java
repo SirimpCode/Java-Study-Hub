@@ -33,10 +33,24 @@ public class CompanyController {
 				.seedMoney(1000000000L)
 				.jobType("서비스업")
 				.build();
+		Company comp2 = Company.builder()
+				.withId("comp2")
+				.withName("켄싱턴호텔")
+				.withPassword("12341234a!")
+				.businessNum("1345526005")
+				.seedMoney(6000000000L)
+				.jobType("서비스업")
+				.build();
 		
-		companyList.add(comp1);
-		
-		
+		Company comp3 = Company.builder()
+				.withId("comp3")
+				.withName("빕스")
+				.withPassword("12341234a!")
+				.businessNum("1230531005")
+				.seedMoney(700000000L)
+				.jobType("서비스업")
+				.build();
+		companyList.addAll(List.of(comp1,comp2,comp3));
 	}
 	
 	//구인회사검색
@@ -48,16 +62,10 @@ public class CompanyController {
 			System.out.println("1.업종타입 검색\t2.회사명 검색\t3.아이디 검색\t4.자본금 검색\t5.이전 메뉴로 돌아가기");
 			String select = sc.nextLine().trim();
 			switch(select) {
-				case "1" :  break;
-				case "2" : break;
-				case "3" : printUserInfoById(sc); break;
-				case "4" : 
-					List<Company> companyList =  findCompanyBySeedMoney(sc);
-					if(companyList.isEmpty()) break;
-					printCompanyInfoGuide();
-					companyList.stream().forEach(cl->System.out.println(cl.getMyInfo(true)));
-					printEndGuide();
-					break;
+				case "1" : searchCompanyByJobType(sc); break;
+				case "2" : searchCompanyByName(sc); break;
+				case "3" : searchCompanyById(sc); break;
+				case "4" : searchCompanyBySeedMoney(sc); break;
 				case "5" : return;
 				default : System.out.println("잘못 입력됨 1 부터 5 중에 입력 해주세요.");
 			}
@@ -65,17 +73,51 @@ public class CompanyController {
 		
 		
 	}
-
 	
-	private List<Company> findCompanyBySeedMoney(Scanner sc) {
-		System.out.println("=> 얼마 이상의 자본금을 보유한 회사를 조회할지 0 이상의 숫자로 입력 해주세요.");
-		String seedStr = inputRepeat(sc, CompanyFieldEnum.SEED_MONEY, false);
-		long seed = Long.parseLong(seedStr);
-		String decimalMoney = new DecimalFormat("#,###").format(seed);
-		System.out.println(decimalMoney+"원 이상의 자본금을 가진 회사를 검색합니다.");
-		List<Company> resultList = companyList.stream().filter(cl-> cl.getSeedMoney()>=seed).toList();
-		if(resultList.isEmpty()) System.out.println(decimalMoney+"원 이상의 자본금을 가진 회사가 없습니다.");
-		return resultList;
+	private void printCompanyInfo(List<Company> cl) {
+		printCompanyInfoGuide();
+		cl.stream().forEach(c->System.out.println(c.getMyInfo(true)));
+		printEndGuide();
+	}
+	private void searchCompanyBySeedMoney(Scanner sc) {
+		System.out.println("얼마 이상의 자본금을 보유한 회사를 검색할지 입력해주세요.");
+		String input = inputRepeat(sc,CompanyFieldEnum.SEED_MONEY, false);
+		long seedMoney = Long.parseLong(input);
+		List<Company> resultList = findCompanyBySeedMoney(seedMoney);
+		
+		if( !resultList.isEmpty() ) printCompanyInfo(resultList);
+		else System.out.println("["+new DecimalFormat("#,###").format(seedMoney)+"원] 이상의 자본금을 보유한 회사가 없습니다.");
+	}
+	
+	private void searchCompanyByName(Scanner sc) {
+		System.out.println("검색어에 포함될 회사명을 공백 없이 한글로만 입력해주세요.");
+		String input = inputRepeat(sc, CompanyFieldEnum.NAME, false);
+		List<Company> resultList = findCompanyByName(input);
+		
+		if( !resultList.isEmpty() ) printCompanyInfo(resultList);
+		else System.out.println("회사명에 ["+input+"] 이 포함된 회사가 없습니다.");
+	}
+	private void searchCompanyByJobType(Scanner sc) {
+		System.out.println("검색어에 포함될 업종명을 공백 없이 한글로만 입력해주세요.");
+		String input = inputRepeat(sc, CompanyFieldEnum.JOB_TYPE, false);
+		String jobType =  String.join("", input.toUpperCase().split("\\ "));//공백제거 대문자변경
+		List<Company> resultList = findCompanyByJobType(jobType);
+		
+		if( !resultList.isEmpty() ) printCompanyInfo(resultList);
+		else System.out.println("["+jobType+"] 업종의 회사가 없습니다.");
+	}
+	private List<Company> findCompanyByName(String name){
+		System.out.println("회사명에 ["+name+"] 이 포함된 회사를 검색합니다.");
+		return companyList.stream().filter(cl->cl.getName().contains(name)).toList();
+	}
+	
+	private List<Company> findCompanyByJobType(String jobType) {
+		System.out.println("["+jobType+"] 관련 업종의 회사를 검색 합니다.");
+		return companyList.stream().filter((cl)->cl.getJobType().contains(jobType)).toList();
+	}
+	private List<Company> findCompanyBySeedMoney(long seedMoney){
+		System.out.println("["+new DecimalFormat("#,###").format(seedMoney)+"원] 이상의 자본금을 보유한 회사를 검색합니다.");
+		return companyList.stream().filter((cl)->cl.getSeedMoney()>=seedMoney).toList();
 	}
 
 		//구인회사전용메뉴
@@ -126,7 +168,7 @@ public class CompanyController {
 	public Company login(Scanner sc) {
 		String id = inputRepeat(sc,Company.CompanyFieldEnum.ID,false);
 		String password = inputRepeat(sc,Company.CompanyFieldEnum.PASSWORD,false);
-		Optional<Company> userOp = findUserById(id);
+		Optional<Company> userOp = findCompanyById(id);
 		if(userOp.isEmpty()) {
 			System.out.println("해당 아이디로 가입된 구인회사가 없습니다.");
 			return null;
@@ -377,6 +419,7 @@ public class CompanyController {
 		return pk;			
 	}
 	private String validSeedMoney(String seedMoney) {
+		seedMoney = String.join("", seedMoney.split("\\,"));
 		try {
 			if(Long.parseLong(seedMoney)<=0)
 				throw new RuntimeException("자본금은 0보다 커야 합니다.");
@@ -458,19 +501,19 @@ public class CompanyController {
 		return companyList.stream().filter(js-> js.getId().equals(id))
 				.findFirst().isPresent();
 	}
-	private void printUserInfoById(Scanner sc) {
-		String userId = inputRepeat(sc, Company.CompanyFieldEnum.ID, false);
-		Optional<Company> userOp = findUserById(userId);
-		if(userOp.isPresent()) {
-			printCompanyInfoGuide();
-			System.out.println(userOp.get().getMyInfo(true)); 
-			printEndGuide();
-			return;
-		}
-		System.out.println("입력하신 아이디의 구인회사가 없습니다.");
+	private void searchCompanyById(Scanner sc) {
+		
+		System.out.println("구인회사의 고유 아이디를 입력해주세요.");
+		String input = inputRepeat(sc, CompanyFieldEnum.ID, false);
+
+		System.out.println("["+input+"] 아이디의 회사를 검색합니다.");
+		Optional<Company> result= findCompanyById(input);
+		
+		if( result.isPresent() ) printCompanyInfo(List.of(result.get()));
+		else System.out.println("구인회사 아이디 ["+input+"] 로 검색된 회사가 없습니다.");
 	}
 	
-	private Optional<Company> findUserById(String id) {
+	private Optional<Company> findCompanyById(String id) {
 		return companyList.stream().filter(js->js.getId().equals(id))
 				.findFirst();
 	}
@@ -478,7 +521,7 @@ public class CompanyController {
 	public void withdrawUser(Scanner sc) {
 		String id = inputRepeat(sc,Company.CompanyFieldEnum.ID,false);
 		String password = inputRepeat(sc,Company.CompanyFieldEnum.PASSWORD,false);
-		Optional<Company> userOp = findUserById(id);
+		Optional<Company> userOp = findCompanyById(id);
 		if(userOp.isEmpty()) {
 			System.out.println("해당 아이디로 가입된 유저가 없습니다.");
 			return;

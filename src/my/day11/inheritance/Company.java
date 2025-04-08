@@ -79,8 +79,10 @@ public class Company extends CommonMember {
 	}
 	public String getMyInfo(boolean masking) {
 		return masking?
-				super.getId()+"\t"+super.maskingPassword()+ "\t"+super.getName()+	"\t"+ this.businessNum +"\t\t"+this.jobType+ "\t"+parsingSeedMoney() + "\t"+ super.getRegisterDay():
-					super.getId()+"\t"+super.getPassword()+ "\t"+super.getName()+	"\t"+ this.businessNum +"\t\t"+this.jobType+ "\t"+parsingSeedMoney() + "\t"+ super.getRegisterDay();
+				super.getId()+"\t"+super.maskingPassword()+ "\t"+
+				(super.getName().length()<6 ? super.getName()+"\t\t":super.getName()+"\t")+ this.businessNum +"\t\t"+this.jobType+ "\t"+parsingSeedMoney() + "\t"+ super.getRegisterDay():
+					super.getId()+"\t"+super.getPassword()+ "\t"+
+					(super.getName().length()<6 ? super.getName()+"\t\t":super.getName()+"\t")+ this.businessNum +"\t\t"+this.jobType+ "\t"+parsingSeedMoney() + "\t"+ super.getRegisterDay();
 	}
 
 	
