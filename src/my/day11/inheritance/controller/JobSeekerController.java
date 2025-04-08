@@ -1,4 +1,4 @@
-package my.day11.inheritance;
+package my.day11.inheritance.controller;
 
 import java.text.DecimalFormat;
 import java.time.DateTimeException;
@@ -17,8 +17,10 @@ import javax.naming.NameNotFoundException;
 import javax.swing.text.DateFormatter;
 
 import my.day01.MyUtil;
-import my.day11.inheritance.Company.CompanyFieldEnum;
-import my.day11.inheritance.JobSeeker.UserFieldEnum;
+import my.day11.inheritance.user.company.Company.CompanyFieldEnum;
+import my.day11.inheritance.user.jobseeker.Gender;
+import my.day11.inheritance.user.jobseeker.JobSeeker;
+import my.day11.inheritance.user.jobseeker.JobSeeker.UserFieldEnum;
 
 public class JobSeekerController {
 	//유저 저장소
@@ -190,8 +192,10 @@ public class JobSeekerController {
 					cc.searchCompany(sc);
 					break;
 				case "5" ://모든채용공고조회
+					cc.printAllPostInfo(sc);
 					break;
 				case "6" ://채용공고상세
+					cc.searchPostDetails(sc);
 					break;
 				case "7" ://채용응모하기
 					break;

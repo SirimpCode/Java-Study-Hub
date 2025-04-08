@@ -1,8 +1,10 @@
-package my.day11.inheritance;
+package my.day11.inheritance.user.company;
 
 import java.text.DecimalFormat;
 
 import my.day01.MyUtil;
+import my.day11.inheritance.user.CommonMember;
+import my.day11.inheritance.user.CommonMember.Builder;
 
 public class Company extends CommonMember {
 	

@@ -1,4 +1,4 @@
-package my.day11.inheritance;
+package my.day11.inheritance.controller;
 
 public class CommonController {
 	// == 시작화면(메인 메뉴)를 보여주는 메소드 생성하기 == //

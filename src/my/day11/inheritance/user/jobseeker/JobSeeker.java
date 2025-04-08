@@ -1,9 +1,11 @@
-package my.day11.inheritance;
+package my.day11.inheritance.user.jobseeker;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import my.day01.MyUtil;
+import my.day11.inheritance.user.CommonMember;
+import my.day11.inheritance.user.CommonMember.Builder;
 
 public class JobSeeker extends CommonMember{
 	

@@ -1,10 +1,10 @@
-package my.day11.inheritance;
+package my.day11.inheritance.user;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import my.day01.MyUtil;
-import my.day11.inheritance.JobSeeker.UserFieldEnum;
+import my.day11.inheritance.user.jobseeker.JobSeeker.UserFieldEnum;
 
 
 public abstract class CommonMember {

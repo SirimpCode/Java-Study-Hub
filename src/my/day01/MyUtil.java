@@ -12,8 +12,8 @@ import javax.management.RuntimeErrorException;
 import javax.naming.NameNotFoundException;
 import javax.security.auth.login.AccountNotFoundException;
 
-import my.day11.inheritance.EnumInterface;
-import my.day11.inheritance.JobSeeker.UserFieldEnum;
+import my.day11.inheritance.user.jobseeker.JobSeeker.UserFieldEnum;
+import my.day11.inheritance.utils.EnumInterface;
 
 
 public class MyUtil {

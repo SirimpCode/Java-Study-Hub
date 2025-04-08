@@ -1,4 +1,6 @@
-package my.day11.inheritance;
+package my.day11.inheritance.user.jobseeker;
+
+import my.day11.inheritance.utils.EnumInterface;
 
 public enum Gender implements EnumInterface{
 	MAIL("남성"),

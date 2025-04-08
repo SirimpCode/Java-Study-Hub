@@ -1,8 +1,9 @@
-package my.day11.inheritance;
+package my.day11.inheritance.controller;
 
 import java.text.DecimalFormat;
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.DuplicateFormatFlagsException;
 import java.util.List;
@@ -12,22 +13,74 @@ import java.util.Scanner;
 import javax.management.RuntimeErrorException;
 
 import my.day01.MyUtil;
-import my.day11.inheritance.Company.CompanyFieldEnum;
-import my.day11.inheritance.JobSeeker.UserFieldEnum;
+import my.day11.inheritance.user.company.Company;
+import my.day11.inheritance.user.company.Company.CompanyFieldEnum;
+import my.day11.inheritance.user.company.RecruitPost;
+import my.day11.inheritance.user.jobseeker.JobSeeker.UserFieldEnum;
 
 public class CompanyController {
 	// 구인회사 회원가입
 
 	private List<Company> companyList = new ArrayList<>();
+	private List<RecruitPost> postList = new ArrayList<>();
+	
 	
 	public List<Company> getCompanyList (){
 		return this.companyList;
 	}
 	
 	public CompanyController() {
+		companyList.addAll( createDefaultCompany() );
+		postList.addAll( createDefaultCompany( this.companyList ) );
+	}
+	private List<RecruitPost> createDefaultCompany(List<Company> comp){
+		RecruitPost rp1 = RecruitPost.fromBuilder()
+				.company(comp.get(0))
+				.title("아무나 다뽑습니다.")
+				.workType("정규직")
+				.cnt(5)
+				.salGrade(3000)
+				.finishDay("20250427")
+				.build();
+		RecruitPost rp2 = RecruitPost.fromBuilder()
+				.company(comp.get(1))
+				.title("대기업 들어올 사람")
+				.workType("정규직")
+				.cnt(3)
+				.salGrade(5000)
+				.finishDay("20250522")
+				.build();
+		RecruitPost rp3 = RecruitPost.fromBuilder()
+				.company(comp.get(2))
+				.title("채용공고 제목이야")
+				.workType("계약직")
+				.cnt(10)
+				.salGrade(2000)
+				.finishDay("20250827")
+				.build();
+		RecruitPost rp4 = RecruitPost.fromBuilder()
+				.company(comp.get(2))
+				.title("마감기한 지났져")
+				.workType("계약직")
+				.cnt(10)
+				.salGrade(2000)
+				.finishDay("20240827")
+				.build();
+		RecruitPost rp5 = RecruitPost.fromBuilder()
+				.company(comp.get(0))
+				.title("아무나 다뽑습니다.길게작성해보기")
+				.workType("정규직")
+				.cnt(5)
+				.salGrade(3000)
+				.finishDay("20250727")
+				.build();
+		return List.of(rp1,rp2,rp3,rp4,rp5);
+	}
+	
+	private List<Company> createDefaultCompany(){
 		Company comp1 = Company.builder()
 				.withId("comp1")
-				.withName("서비스마스터")
+				.withName("서브마스")
 				.withPassword("12341234a!")
 				.businessNum("1200520005")
 				.seedMoney(1000000000L)
@@ -50,7 +103,7 @@ public class CompanyController {
 				.seedMoney(700000000L)
 				.jobType("서비스업")
 				.build();
-		companyList.addAll(List.of(comp1,comp2,comp3));
+		return List.of(comp1,comp2,comp3);
 	}
 	
 	//구인회사검색
@@ -72,6 +125,11 @@ public class CompanyController {
 		}
 		
 		
+	}
+	private void printPostInfo(List<RecruitPost> posts) {
+		printPostInfoGuide();
+		posts.stream().forEach(post->System.out.println(post.getPostInfo()));
+		printEndGuide();
 	}
 	
 	private void printCompanyInfo(List<Company> cl) {
@@ -121,49 +179,52 @@ public class CompanyController {
 	}
 
 		//구인회사전용메뉴
-		public void loginLogic(Scanner sc, Company loginUser, JobSeekerController jsc) {
+	public void loginLogic(Scanner sc, Company loginUser, JobSeekerController jsc) {
+		
+		main:
+		while(true) {
 			
-			main:
-			while(true) {
+			loginMenu(loginUser.getName());
+			String select = sc.nextLine().trim();
+			
+			
+			switch(select.trim()) {
+				case "1": //회사 정보 보기
+					System.out.println(">> "+loginUser.getName()+" 의 정보");
+					printCompanyInfoGuide();
+					System.out.println(loginUser.getMyInfo(false));
+					printEndGuide();
+					break;
+				case "2":  //회사 정보 수정 비번, 회사명 , 사업자번호, 직종, 자본금
+					modifyMyInfo(loginUser,sc);
+					break;
+				case "3": // 모든구직자 조회
+					jsc.printAllUserInfo();
+					break;
 				
-				loginMenu(loginUser.getName());
-				String select = sc.nextLine().trim();
+				case "4" ://구직자 검색 하기
+					jsc.searchJobSeeker(sc);
+					break;
+				case "5" ://채용공고입력하기
+					createRecruitPost(sc,loginUser);
+					break;
+				case "6" ://우리회사 채용공고 조회
+					searchMyCompanyPost(sc, loginUser);
+					break;
+				case "7" ://우리회사 채용공고 지원자 조회
+				case "8": 
+					break main; //로그아웃
 				
-				
-				switch(select.trim()) {
-					case "1": //회사 정보 보기
-						System.out.println(">> "+loginUser.getName()+" 의 정보");
-						printCompanyInfoGuide();
-						System.out.println(loginUser.getMyInfo(false));
-						printEndGuide();
-						break;
-					case "2":  //회사 정보 수정 비번, 회사명 , 사업자번호, 직종, 자본금
-						modifyMyInfo(loginUser,sc);
-						break;
-					case "3": // 모든구직자 조회
-						jsc.printAllUserInfo();
-						break;
-					
-					case "4" ://구직자 검색 하기
-						jsc.searchJobSeeker(sc);
-						break;
-					case "5" ://채용공고입력하기
-						break;
-					case "6" ://우리회사 채용공고 조회
-						break;
-					case "7" ://우리회사 채용공고 지원자 조회
-					case "8": 
-						break main; //로그아웃
-					
-					default : System.out.println("잘못 입력됨 1 부터 10 중 입력하세요.");
-				}
+				default : System.out.println("잘못 입력됨 1 부터 10 중 입력하세요.");
 			}
-			
 		}
+			
+	}
 		
 	
 	
 	
+
 	//구인회사 로그인
 	public Company login(Scanner sc) {
 		String id = inputRepeat(sc,Company.CompanyFieldEnum.ID,false);
@@ -486,8 +547,37 @@ public class CompanyController {
 		);
 		printEndGuide();
 	}
-	
-	
+	public void printAllPostInfo(Scanner sc) {
+		
+		if(postList.isEmpty()) {
+			System.out.println("존재하는 채용공고가 없습니다.");
+			return;
+		}
+		System.out.println("결과에 마감 기한이 지난 게시물을 포함 시킬지 선택 해주세요.");
+		boolean isBefore = userSelectYesOrNo(sc);
+				
+		if(!isBefore) System.out.println("채용 마감 기한이 지난 게시물을 제외한 게시물을 조회합니다.");
+		else System.out.println("모든 게시물을 조회합니다.");
+		
+		List<RecruitPost> validList = isBefore ? this.postList : getValidPost();
+		if(validList.isEmpty()) {
+			System.out.println("진행중인 채용 공고가 없습니다."); return;
+		}
+		
+		System.out.println("=".repeat(40)+" 채용 공고 조회 결과 "+"=".repeat(40));
+		System.out.println("조회된 게시물 : " + validList.size() + "개"+(!isBefore?"　　　　　기간이 지난 게시물 : " + (postList.size()-validList.size())+"개":""));
+		
+		printPostInfo(validList);
+	}
+	private List<RecruitPost> getValidPost(){
+		return postList.stream().filter(p->
+			LocalDate.parse(p.getFinishDay()).plusDays(1).isAfter(LocalDate.now())).toList();
+	}
+	private void printPostInfoGuide() {
+		System.out.println("-".repeat(112));
+		System.out.println("게시물번호\t제목\t\t\t\t회사명\t채용방식\t채용인원\t연봉\t마감일\t\t등록일");
+		System.out.println("-".repeat(112));
+	}
 	private void printCompanyInfoGuide() {
 		System.out.println("-".repeat(112));
 		System.out.println("아이디\t비밀번호\t\t회사명\t\t사업자등록번호\t\t직종타입\t자본금\t\t가입날짜");
@@ -535,30 +625,164 @@ public class CompanyController {
 			System.out.println("유저 탈퇴 성공");;
 		
 	}
-
-//	public void searchUser(Scanner sc) {
-//		while(true) {
-////			if(jobSeekerList.isEmpty()) {
-////				System.out.println("가입된 유저가 없습니다."); return;
-////			}
-//			System.out.println("1. 연령대 검색\t2. 성별 검색\t3.아이디 검색\t4. 나이와 성별로 검색\t5. 메인 메뉴로 돌아가기");
-//			String select = sc.nextLine().trim();
-//			switch(select) {
-//				case "1" : searchUserAge(sc); break;
-//				case "2" : searchUserByGender(sc); break;
-//				case "3" : printUserInfoById(sc); break;
-//				case "4" : searchUserByAgeAndGender(sc); break;
-//				case "5" : return;
-//				default : System.out.println("잘못 입력됨 1 부터 5 중에 입력 해주세요.");
-//			}
-//		}
-//		
-//	}
 	
 	
-
-
-
 	
 	
+	//채용공고
+	private List<RecruitPost> findPostByCompany(Company company){
+		return postList.stream().filter(p->p.getCompany().equals(company)).toList();
+	}
+	private void searchMyCompanyPost(Scanner sc, Company loginUser) {
+		System.out.println("우리 회사 정보로 게시물을 조회 합니다.");
+		List<RecruitPost> myPost = findPostByCompany(loginUser);
+		if(myPost.isEmpty()) {
+			System.out.println("우리 회사의 작성된 채용 공고가 없습니다.");
+			return;
+		}
+		printPostInfo(myPost);
+	}
+
+
+	private void createRecruitPost(Scanner sc, Company loginUser) {
+		System.out.println("4자 ~ 20자 사이의 게시물 제목을 입력해주세요.");
+		String title = getTitleRepeat(sc);
+		System.out.println("2자 ~ 10자 사이의 근무 형태를 입력해주세요.");
+		String workType= getWorkTypeRepeat(sc);
+		System.out.println("1명 이상의 채용 인원을 입력해주세요.");
+		int cnt = getCntRepeat(sc);
+		System.out.println("1000 ~ 90000 사이의 연봉을 입력해주세요. (만원 단위)");
+		int salGrade = getSalGradeRepeat(sc);
+		System.out.println("마감일을 yyyyMMdd 형식으로 입력해주세요. ex) 20250101");
+		String finishDay = getFinishDayRepeat(sc);
+		
+		RecruitPost newPost = RecruitPost.fromBuilder()
+				.company(loginUser)
+				.title(title)
+				.workType(workType)
+				.cnt(cnt)
+				.salGrade(salGrade)
+				.finishDay(finishDay)
+				.build();
+		postList.add(newPost);
+		System.out.println("성공적으로 채용 공고 게시물을 생성하였습니다.");
+	}
+	private int getPostIdRepeat(Scanner sc) {
+		while(true) {
+			System.out.print("게시물 번호 : ");
+			String input = sc.nextLine();
+			if(input.matches("^[1-9][0-9]{3}$")) return Integer.parseInt(input);
+			System.out.println("0이 아닌 숫자로 시작하는 4자리의 숫자를 입력해주세요.");
+		}
+	}
+
+	public void searchPostDetails(Scanner sc) {
+		System.out.println("조회할 게시물 번호 숫자 네자리를 입력하세요.");
+		int postId = getPostIdRepeat(sc);
+		Optional<RecruitPost> postOp = findPostById(postId);
+		if(postOp.isPresent()) {
+			printPostDetails(postOp.get());
+			return;
+		}
+		System.out.println("게시물 번호가 ["+postId+"] 인 게시물이 없습니다.");
+	}
+	public Optional<RecruitPost> findPostById(int postId){
+		return postList.stream().filter(p->p.getPostId()==postId).findFirst();
+	}
+	private String getTitleRepeat(Scanner sc) {
+		while(true) {
+			System.out.println("게시물 제목 : ");
+			String input = sc.nextLine().strip();
+			if(input.length()<=20&&input.length()>=4) return input; 
+			System.out.println("게시물 제목은 4자 이상 20자 이하여야합니다.");	
+		}
+	}
+	private String getWorkTypeRepeat(Scanner sc) {
+		while(true) {
+			System.out.println("근무형태 : ");
+			String input = sc.nextLine().strip();
+			if(input.length()<=10&&input.length()>=2) return input; 
+			System.out.println("근무형태는 2자 이상 10자 이하여야합니다.");	
+		}
+	}
+	private int getCntRepeat(Scanner sc) {
+		while(true) {
+			System.out.println("채용인원 : ");
+			String input = sc.nextLine().strip();
+			try {
+				int cnt = Integer.parseInt(input);
+				if(cnt>0) return cnt;
+			}catch(NumberFormatException e){
+				System.out.println("숫자만 입력해주세요.");
+				continue;
+			}
+			System.out.println("채용인원은 0명 초과여야 합니다.");	
+		}
+	}
+	private int getSalGradeRepeat(Scanner sc) {
+		while(true) {
+			System.out.println("연봉 : ");
+			String input = sc.nextLine().strip();
+			try {
+				int cnt = Integer.parseInt(input);
+				if(cnt>=1000&&cnt<=90000) return cnt;
+			}catch(NumberFormatException e){
+				System.out.println("숫자만 입력해주세요.");
+				continue;
+			}
+			System.out.println("연봉은 1000 이상 90000 이하로 입력해주세요.");	
+		}
+	}
+	
+	private String getFinishDayRepeat(Scanner sc) {
+		while(true) {
+			System.out.println("마감일 : ");
+			String input = sc.nextLine().strip();
+			if(input.length()==8&&input.matches("^[2][0-9]{7}$")) {
+				String year = input.substring(0,4);
+				String month = input.substring(4,6);
+				String day = input.substring(6,8);				
+				try {
+					LocalDate finishDay = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day));
+					if(finishDay.isAfter(LocalDate.now())) return input;
+					System.out.println("오늘 이후의 날짜를 입력해주세요.");
+					continue;
+				}catch(DateTimeException e) {
+					System.out.println("존재 하지 않는 날짜 입니다.");
+					continue;
+				}
+			}
+			System.out.println("2로 시작하는 8자리의 숫자만 입력해주세요. ex)20250508");	
+		}
+	}
+	private void printPostDetails(RecruitPost post) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("=".repeat(50)+"\n");
+		//채용 번호 채용제목 분야 인원 연봉 등록일자 채용마감일자 회사명 업종 자본금
+		sb.append("1. 게시물번호 : "+post.getPostId()+"\n");
+		sb.append("2. 제목 : "+post.getTitle()+"\n");
+		sb.append("3. 근무형태 : "+post.getWorkType()+"\n");
+		sb.append("4. 채용인원 : "+post.getCnt()+"명\n");
+		sb.append("5. 연봉 : "+post.getSalGrade()+"만원\n");
+		sb.append("6. 마감일 : "+post.getFinishDay()+"\n");
+		sb.append("7. 등록일 : "+post.getCreatedAt()+"\n");
+		sb.append("8. 회사명 : "+post.getCompany().getName()+"\n");
+		sb.append("9. 업종 : "+post.getCompany().getJobType()+"\n");
+		sb.append("10. 자본금 : "+new DecimalFormat("#,###").format(post.getCompany().getSeedMoney())+"원");
+		System.out.print(sb);
+	}
+	private boolean userSelectYesOrNo(Scanner sc) {
+		while(true) {
+			System.out.print("yes 또는 no 를 입력해주세요 : ");
+			String input = sc.nextLine();
+			switch(input.toUpperCase()) {
+				case "YES" : return true;
+				case "NO" : return false;
+				default : 
+					System.out.println("잘못 입력 됐습니다.");
+					continue;	
+			}
+		}
+		
+	}
 }

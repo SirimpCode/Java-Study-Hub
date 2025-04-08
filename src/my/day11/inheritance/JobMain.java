@@ -2,13 +2,20 @@ package my.day11.inheritance;
 
 import java.time.LocalDate;
 
+
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 import my.day01.MyUtil;
-import my.day11.inheritance.JobSeeker.UserFieldEnum;
+import my.day11.inheritance.controller.CommonController;
+import my.day11.inheritance.controller.CompanyController;
+import my.day11.inheritance.controller.JobSeekerController;
+import my.day11.inheritance.user.CommonMember;
+import my.day11.inheritance.user.company.Company;
+import my.day11.inheritance.user.jobseeker.JobSeeker;
+import my.day11.inheritance.user.jobseeker.JobSeeker.UserFieldEnum;
 
 public class JobMain {
 
@@ -29,10 +36,13 @@ public class JobMain {
 //		System.out.println(MyUtil.validationUserField(UserFieldEnum.PRIMARY_KEY, "9212122"));
 		
 		
+		
 		final Scanner sc = new Scanner(System.in);
 		final JobSeekerController jsc = new JobSeekerController();
 		final CommonController commonCtrl = new CommonController();
 		final CompanyController companyCtrl = new CompanyController();
+		
+		
 		
 		CommonMember loginUser = null;
 
