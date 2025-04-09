@@ -10,12 +10,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
+import javax.management.InstanceNotFoundException;
 import javax.management.RuntimeErrorException;
+import javax.management.relation.RelationNotFoundException;
 
 import my.day01.MyUtil;
+import my.day11.inheritance.user.RequestJoined;
 import my.day11.inheritance.user.company.Company;
 import my.day11.inheritance.user.company.Company.CompanyFieldEnum;
 import my.day11.inheritance.user.company.RecruitPost;
+import my.day11.inheritance.user.jobseeker.JobSeeker;
 import my.day11.inheritance.user.jobseeker.JobSeeker.UserFieldEnum;
 
 public class CompanyController {
@@ -126,7 +130,7 @@ public class CompanyController {
 		
 		
 	}
-	private void printPostInfo(List<RecruitPost> posts) {
+	public void printPostInfo(List<RecruitPost> posts) {
 		printPostInfoGuide();
 		posts.stream().forEach(post->System.out.println(post.getPostInfo()));
 		printEndGuide();
@@ -212,6 +216,9 @@ public class CompanyController {
 					searchMyCompanyPost(sc, loginUser);
 					break;
 				case "7" ://우리회사 채용공고 지원자 조회
+					RecruitPost rp = selectMyPost(loginUser,sc);
+					jsc.searchMyCompanyJoinUser(rp);
+					break;
 				case "8": 
 					break main; //로그아웃
 				
@@ -223,6 +230,19 @@ public class CompanyController {
 		
 	
 	
+	private RecruitPost selectMyPost(Company loginUser, Scanner sc) {
+		List<RecruitPost> myPosts =  findPostByCompany(loginUser);
+		printPostInfo(myPosts);
+		while(true) {
+			System.out.println("지원자를 조회할 채용공고 아이디를 입력해주세요.");
+			int postId = getPostIdRepeat(sc);
+			Optional<RecruitPost> opRp = myPosts.stream().filter((rp)-> rp.getPostId() == postId).findFirst();
+			if(opRp.isPresent()) return opRp.get();
+			System.out.println("위 목록에 있는 채용공고 아이디를 입력해주세요.");
+			continue;
+		}
+	}
+
 	
 
 	//구인회사 로그인
@@ -645,6 +665,8 @@ public class CompanyController {
 
 
 	private void createRecruitPost(Scanner sc, Company loginUser) {
+		System.out.println("=".repeat(10)+" "+loginUser.getName()+" 채용공고 등록 "+"=".repeat(10));
+		
 		System.out.println("4자 ~ 20자 사이의 게시물 제목을 입력해주세요.");
 		String title = getTitleRepeat(sc);
 		System.out.println("2자 ~ 10자 사이의 근무 형태를 입력해주세요.");
@@ -722,10 +744,10 @@ public class CompanyController {
 	private int getSalGradeRepeat(Scanner sc) {
 		while(true) {
 			System.out.println("연봉 : ");
-			String input = sc.nextLine().strip();
+			String input = sc.nextLine();
 			try {
-				int cnt = Integer.parseInt(input);
-				if(cnt>=1000&&cnt<=90000) return cnt;
+				int pay = Integer.parseInt(String.join("",input.split("[ ,]")));
+				if(pay>=1000&&pay<=90000) return pay;
 			}catch(NumberFormatException e){
 				System.out.println("숫자만 입력해주세요.");
 				continue;
@@ -783,6 +805,18 @@ public class CompanyController {
 					continue;	
 			}
 		}
-		
 	}
+	public RequestJoined userJoinCompany(Scanner sc, JobSeeker loginUser)  {
+		int postId = getPostIdRepeat(sc);
+		RecruitPost post = findPostById(postId)
+				.orElseThrow(()->new RuntimeException("["+postId+"] 번호의 채용 공고가 존재하지 않습니다."));
+		if(LocalDate.now().isAfter(LocalDate.parse(post.getFinishDay())))
+			throw new RuntimeException("채용 마감 일자가 지났습니다. 채용 마감일자 : ["+post.getFinishDay()+"]");
+		
+		return RequestJoined.of(post, loginUser);		
+	}
+	
+	
+	
+	
 }

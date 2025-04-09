@@ -23,7 +23,7 @@ public class RecruitPost {
 	public static int genereatedId = 1001; // 객체의 고유 번호 
 	
 	public String getPostInfo() {
-		return postId+"\t"+title+"\t\t"+(title.length()>10 ? "":"\t")+company.getName()+"\t"+workType+"\t"+cnt+"명\t"+salGrade+"\t"+finishDay+"\t"+createdAt;
+		return postId+"\t"+title+"\t\t"+(title.length()>12 ? "":"\t")+company.getName()+"\t"+workType+"\t"+cnt+"명\t"+salGrade+"\t"+finishDay+"\t"+createdAt;
 	}
 	
 	private RecruitPost(RecruitPost.Builder builder) {

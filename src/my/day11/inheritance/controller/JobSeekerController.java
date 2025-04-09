@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.DuplicateFormatFlagsException;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,10 @@ import javax.naming.NameNotFoundException;
 import javax.swing.text.DateFormatter;
 
 import my.day01.MyUtil;
+import my.day11.inheritance.user.RequestJoined;
+import my.day11.inheritance.user.company.Company;
 import my.day11.inheritance.user.company.Company.CompanyFieldEnum;
+import my.day11.inheritance.user.company.RecruitPost;
 import my.day11.inheritance.user.jobseeker.Gender;
 import my.day11.inheritance.user.jobseeker.JobSeeker;
 import my.day11.inheritance.user.jobseeker.JobSeeker.UserFieldEnum;
@@ -25,12 +29,12 @@ import my.day11.inheritance.user.jobseeker.JobSeeker.UserFieldEnum;
 public class JobSeekerController {
 	//유저 저장소
 	private List<JobSeeker> jobSeekerList = new ArrayList<>();
-	
+	private List<RequestJoined> requestJoinedList = new ArrayList<>();//입사지원
 	public List<JobSeeker> getJobSeekerList(){
 		return this.jobSeekerList;
 	}
 	
-	public JobSeekerController() {
+	private List<JobSeeker> createStartJobSeeker(){
 		JobSeeker js1 = JobSeeker.builder()
 				.withId("abcd")
 				.withName("일유저")
@@ -49,11 +53,13 @@ public class JobSeekerController {
 				.withPassword("12341234a!")
 				.userPrimaryKey("0012053")
 				.build();
-		
-		jobSeekerList.addAll(List.of(js1, js2, js3));
-		
+		return	List.of(js1, js2, js3);
 	}
 	
+
+	public JobSeekerController() {
+		jobSeekerList.addAll( createStartJobSeeker() );
+	}
 	//구직자 로그인
 	public JobSeeker login(Scanner sc) {
 		String id = inputRepeat(sc,JobSeeker.UserFieldEnum.ID,false);
@@ -198,8 +204,23 @@ public class JobSeekerController {
 					cc.searchPostDetails(sc);
 					break;
 				case "7" ://채용응모하기
+					try {
+						RequestJoined join = cc.userJoinCompany(sc,loginUser);
+						requestJoinedList.add(join);
+						System.out.println("["+join.getRecruitPost().getCompany().getName()+"]의 ["+join.getRecruitPost().getTitle()+"] 에 채용공고에 지원하였습니다.");
+					}catch(RuntimeException e) {
+						System.out.println(e.getMessage());
+					}
 					break;
 				case "8" ://채용응모한것조회
+					List<RequestJoined> myRj = findRequestJoinedByUser(loginUser);
+					List<RecruitPost> postList = myRj.stream().map(rj-> rj.getRecruitPost()).toList();
+					if ( !myRj.isEmpty() ) {
+						System.out.println("내가 지원한 채용 공고들");
+						cc.printPostInfo(postList);
+						break;
+					}
+					System.out.println("내가 지원한 채용 공고문이 없습니다.");
 					break;
 				case "9" ://채용응모수정
 					break;
@@ -213,6 +234,10 @@ public class JobSeekerController {
 		
 	}
 	
+	private List<RequestJoined> findRequestJoinedByUser(JobSeeker loginUser){
+		return requestJoinedList.stream().filter(rj->rj.getJobSeeker().equals(loginUser)).toList();
+	}
+
 	//메인메뉴 출력
 	private void mainMenu() {
 		System.out.println("\n"+"=".repeat(40)+" 메인메뉴 "+"=".repeat(40)+"\n"
@@ -558,5 +583,20 @@ public class JobSeekerController {
 				System.out.println("잘못 입력됨 올바른 연령대를 입력해주세요.\n");
 			}
 		}
+	}
+
+	public void searchMyCompanyJoinUser(RecruitPost post) {
+		List<JobSeeker> myJobSeekerList = findJobSeekerByPost(post);
+		if(!myJobSeekerList.isEmpty()) {
+			System.out.println("======= 우리 회사 채용공고의 지원자 목록 =======");
+			printJobSeekerInfo(myJobSeekerList);
+			return;
+		}
+		System.out.println("우리회사 채용공고에 지원한 지원자가 없습니다.");
+	}
+
+	private List<JobSeeker> findJobSeekerByPost(RecruitPost post) {
+		return requestJoinedList.stream().filter(rj->rj.getRecruitPost().equals(post))
+				.map(rj->rj.getJobSeeker()).toList();
 	}
 }
