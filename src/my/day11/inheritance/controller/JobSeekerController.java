@@ -205,7 +205,7 @@ public class JobSeekerController {
 					break;
 				case "7" ://채용응모하기
 					try {
-						RequestJoined join = cc.userJoinCompany(sc,loginUser);
+						RequestJoined join = cc.userJoinCompany(sc,loginUser, requestJoinedList);
 						requestJoinedList.add(join);
 						System.out.println("["+join.getRecruitPost().getCompany().getName()+"]의 ["+join.getRecruitPost().getTitle()+"] 에 채용공고에 지원하였습니다.");
 					}catch(RuntimeException e) {
@@ -227,6 +227,10 @@ public class JobSeekerController {
 				
 				case "10": 
 					break main; //로그아웃
+				case "11" : //채용마감일자 오늘 포함 오늘이후것들 가져오기 (강사님버전)
+					System.out.println();
+					cc.printPostMission();
+					break;
 				
 				default : System.out.println("잘못 입력됨 1 부터 10 중 입력하세요.");
 			}
@@ -426,7 +430,7 @@ public class JobSeekerController {
 		}
 		System.out.println("=".repeat(40)+" 모든 구직자 조회 결과 "+"=".repeat(40));
 		printUserInfoGuide();
-		jobSeekerList.stream().forEach(
+		jobSeekerList.forEach(
 				js-> System.out.println(js.getMyInfo(true))
 		);
 		printEndGuide();
@@ -585,18 +589,43 @@ public class JobSeekerController {
 		}
 	}
 
-	public void searchMyCompanyJoinUser(RecruitPost post) {
-		List<JobSeeker> myJobSeekerList = findJobSeekerByPost(post);
+	public void searchMyCompanyJoinUser(RecruitPost post,Scanner sc) {
+		List<RequestJoined> myRjList = findJobSeekerByPost(post);
+		List<JobSeeker> myJobSeekerList = myRjList.stream().map(rj->rj.getJobSeeker()).toList();
 		if(!myJobSeekerList.isEmpty()) {
-			System.out.println("======= 우리 회사 채용공고의 지원자 목록 =======");
+			System.out.println("======= 우리 회사 채용공고 ["+post.getTitle()+"]의 지원자 목록 =======");
 			printJobSeekerInfo(myJobSeekerList);
+			printJobSeekerDetails(myRjList,sc);
 			return;
 		}
 		System.out.println("우리회사 채용공고에 지원한 지원자가 없습니다.");
 	}
 
-	private List<JobSeeker> findJobSeekerByPost(RecruitPost post) {
+	private void printJobSeekerDetails(List<RequestJoined> myRjList,Scanner sc) {
+		RequestJoined selectRj = repeatRjListById(myRjList , sc);
+		StringBuilder sb = new StringBuilder();
+		sb.append("지원 공고 : "+selectRj.getRecruitPost().getTitle()+"\n");
+		sb.append("이름 : "+selectRj.getJobSeeker().getName()+"\n");
+		sb.append("성별 : "+selectRj.getJobSeeker().getGender().getValue()+"\n");
+		sb.append("만나이 : "+MyUtil.getAge(selectRj.getJobSeeker().getUserPrimaryKey())+"\n");
+		sb.append("지원동기 : "+selectRj.getApplyMotive()+"\n");
+		sb.append("지원날짜 : "+selectRj.getCreatedAt());
+		System.out.println(sb);
+	}
+
+	private RequestJoined repeatRjListById(List<RequestJoined> myRjList, Scanner sc) {
+		while(true) {
+			System.out.println("조회하실 지원자의 아이디를 입력하세요.");
+			String id = inputRepeat(sc, UserFieldEnum.ID, false);
+			Optional<RequestJoined> opRj = myRjList.stream().filter((rj)-> rj.getJobSeeker().getId().equals(id)).findFirst();
+			if(opRj.isPresent()) return opRj.get();
+			System.out.println("위의 지원자 목록에 존재하는 구직자의 ID 를입력해주세요.");
+		}
+	}
+	//채용공고번호 회사명 채용제목 채용분야근무형태 채용인원 연봉 채용마감일자
+	private List<RequestJoined> findJobSeekerByPost(RecruitPost post) {
+	
 		return requestJoinedList.stream().filter(rj->rj.getRecruitPost().equals(post))
-				.map(rj->rj.getJobSeeker()).toList();
+				.toList();
 	}
 }

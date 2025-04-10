@@ -35,6 +35,34 @@ public class JobMain {
 //		System.out.println("가나다라마바".matches("^[가-힣]{2,6}"));
 //		System.out.println(MyUtil.validationUserField(UserFieldEnum.PRIMARY_KEY, "9212122"));
 		
+		int num = 100;				// 4 3 2 1
+		int j = num%2==0 ? num/2-1 : num/2;
+		for(int i = 0; i<num; i+=2) {// 1 3 5 7
+			System.out.println(" ".repeat(j--)+"*".repeat(i+1));
+		}
+		j = 1;
+		for(int i = num%2==0 ? num-2 : num-1; i>0; i-=2) {//  7 5 3 1
+			System.out.println(" ".repeat(j++)+"*".repeat(i-1));
+		}		
+		
+		int starNum  = 10;
+		int support = 0;
+		for(int i = 1; i<starNum; i+=2) {
+			System.out.println(" ".repeat(starNum+3-support++)+"*".repeat(i));
+		}
+		support = 0;
+		for(int i = (starNum-1)*3; i>starNum*2; i-=2) {
+			System.out.println(" ".repeat(support++)+"*".repeat(i));
+		}
+		support = 2;
+		int sup = 1;
+		//2 11 1 11
+		for(int i = starNum; i>0; i-=2 ) {
+			System.out.println(" ".repeat(support<0?0:support--)+"*".repeat(i+1)+" ".repeat(sup)+"*".repeat(i+1));
+			sup+=5;
+		}
+		
+		
 		
 		
 		final Scanner sc = new Scanner(System.in);
