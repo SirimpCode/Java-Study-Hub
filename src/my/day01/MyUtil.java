@@ -1,10 +1,13 @@
 package my.day01;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.Random;
 
@@ -163,8 +166,25 @@ public class MyUtil {
 			case NAME -> value.matches("^[가-힣]{2,7}");
 		};
 	}
-	
-	
+
+	public static int dateCompareTo(String strFinishDay, String yyyyMMdd) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		sdf.setLenient(false);
+		// false 로 해주어야만 입력한 값을 날짜 타입으로 변경할때 날짜로 되지 못하는 값일 경우 오류가 발생한다.
+		try {
+			Date registerDay = sdf.parse(yyyyMMdd);
+			Date finishDay = sdf.parse(strFinishDay);
+			// 마감일자가 등록일자보다 이후인지 비교
+			// finishDay 가 registerDay 보다 이후이면 1을 리턴
+			// finishDay 가 registerDay 보다 이전이면 -1을 리턴
+			return finishDay.compareTo(registerDay);
+		}  catch (ParseException e) {
+			throw new RuntimeException("[경고] 채용마감일자는 달력에 존재하는 날짜이어야 합니다.\n");
+        }
+
+    }
+
+
 	// 성별과 주민번호의 enum 클래스
 	private static enum Gender {
 		OLDMALE,
