@@ -15,6 +15,9 @@ public class RequestJoined {
 	public RequestJoined(){
 		
 	}
+	public void setMotive(String motive) {
+		this.applyMotive = motive;
+	}
 	
 	private RequestJoined(RecruitPost recruit, JobSeeker job, String motive) {
 		this.recruit = recruit;

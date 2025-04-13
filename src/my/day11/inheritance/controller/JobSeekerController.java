@@ -213,9 +213,8 @@ public class JobSeekerController {
 					}
 					break;
 				case "8" ://채용응모한것조회
-					List<RequestJoined> myRj = findRequestJoinedByUser(loginUser);
-					List<RecruitPost> postList = myRj.stream().map(rj-> rj.getRecruitPost()).toList();
-					if ( !myRj.isEmpty() ) {
+					List<RecruitPost> postList = searchMyJoinPost(loginUser);
+					if ( !postList.isEmpty() ) {
 						System.out.println("내가 지원한 채용 공고들");
 						cc.printPostInfo(postList);
 						break;
@@ -223,6 +222,15 @@ public class JobSeekerController {
 					System.out.println("내가 지원한 채용 공고문이 없습니다.");
 					break;
 				case "9" ://채용응모수정
+					List<RecruitPost> postList2 = searchMyJoinPost(loginUser);
+					if ( !postList2.isEmpty() ) {
+						System.out.println("내가 지원한 채용 공고들");
+						cc.printPostInfo(postList2);
+
+						modifyJoin(loginUser, sc);
+						break;
+					}
+					System.out.println("내가 지원한 채용 공고문이 없습니다.");
 					break;
 				
 				case "10": 
@@ -237,7 +245,35 @@ public class JobSeekerController {
 		}
 		
 	}
-	
+	private List<RecruitPost> searchMyJoinPost(JobSeeker js) {
+		List<RequestJoined> myRj = findRequestJoinedByUser(js);
+		List<RecruitPost> postList = myRj.stream().map(rj-> rj.getRecruitPost()).toList();
+		if ( !myRj.isEmpty() ) {
+			return postList;
+		}
+		return null;
+	}
+	private void modifyJoin(JobSeeker loginUser, Scanner sc) {
+		List<RequestJoined> myRj = findRequestJoinedByUser(loginUser); 
+		while(true) {
+			System.out.print("수정할 채용공고 번호를 입력해주세요. => ");
+			String str = sc.nextLine();
+			try {
+				RequestJoined myJoin = myRj.stream().filter(rj->rj.getRecruitPost().getPostId() == Integer.parseInt(str)).findAny()
+						.orElseThrow(()-> new RuntimeException("못찾음"));
+				System.out.println("수정할 지원동기 입력 => ");
+				String dongi = sc.nextLine();
+				myJoin.setMotive(dongi);
+				System.out.println("지원동기 수정완료");		
+				return;
+			}catch(Exception e) {
+				System.out.println("수정할 채용공고 번호를 위 목록을 참고하여 입력해주세요.");
+				continue;
+			}
+		}
+		
+	}
+
 	private List<RequestJoined> findRequestJoinedByUser(JobSeeker loginUser){
 		return requestJoinedList.stream().filter(rj->rj.getJobSeeker().equals(loginUser)).toList();
 	}

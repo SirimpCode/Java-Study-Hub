@@ -793,6 +793,7 @@ public class CompanyController {
 				return RequestJoined.of(post, loginUser, motive);
 			System.out.println("입사 지원 동기를 입력해주세요.");
 		}
+	
 	}
 
 	

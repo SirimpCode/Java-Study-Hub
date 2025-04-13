@@ -1,21 +1,13 @@
 package my.day11.inheritance;
 
-import java.time.LocalDate;
-
-
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
-import my.day01.MyUtil;
 import my.day11.inheritance.controller.CommonController;
 import my.day11.inheritance.controller.CompanyController;
 import my.day11.inheritance.controller.JobSeekerController;
 import my.day11.inheritance.user.CommonMember;
 import my.day11.inheritance.user.company.Company;
 import my.day11.inheritance.user.jobseeker.JobSeeker;
-import my.day11.inheritance.user.jobseeker.JobSeeker.UserFieldEnum;
 
 public class JobMain {
 
@@ -61,8 +53,37 @@ public class JobMain {
 			System.out.println(" ".repeat(support<0?0:support--)+"*".repeat(i+1)+" ".repeat(sup)+"*".repeat(i+1));
 			sup+=5;
 		}
+		//삼각형쌓기
+		int limit = 20;
+		for(int i = 0; i<=limit; i++) {
+			System.out.println(" ".repeat(limit*2-i+2)+"*".repeat(i*2+1));
+		}
+		for(int i = 0; i<=limit+1; i++) {// 5
+			System.out.println(" ".repeat(limit-i+1)+"*".repeat(i*2+1)+" ".repeat(limit-i==-1?0:(limit-i)*2+1)+"*".repeat(i*2+1));
+		}
 		
-		
+/*5일때
+*****       *****      *5 7 *5
+ *   *     *   *		1 *1 3 *1 5 *1 3 *1 
+  *   *   *   *
+   *   * *   *
+    *   *   *
+   *   * *   *
+  *   *   *   *
+ *   *     *   *
+*****       *****
+2일때
+** **
+ ***
+** **
+		 */
+		int xMark = 5;
+		int s = xMark+2;
+		for(int i=0; i<xMark; i++) {
+			System.out.println(" ".repeat(i)+"*"+(i==0?"*".repeat(3):" ".repeat(3))+"*"+" ".repeat(s)+"*");
+			s-=2;
+			
+		}
 		
 		
 		final Scanner sc = new Scanner(System.in);
