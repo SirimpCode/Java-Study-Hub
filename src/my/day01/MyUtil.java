@@ -20,6 +20,9 @@ import my.day11.inheritance.utils.EnumInterface;
 
 
 public class MyUtil {
+	/**인스턴스화 방지*/
+	private MyUtil() {}
+	
 	public static String currentTime() {
 		DateTimeFormatter formatter = DateTimeFormatter
 				.ofPattern("yyyy년MM월dd일 hh:mm:ss");
@@ -99,7 +102,7 @@ public class MyUtil {
 		return now.isBefore(user.withYear(now.getYear())) ?
 				now.getYear() - user.getYear() - 1 : now.getYear() - user.getYear();
 	}
-	private static Gender createGender(String userPk) {
+	public static Gender createGender(String userPk) {
 		
 		int genderInt = getPkParseInt(MyPkEnum.GENDER, userPk);
 		return parseGenderInt(genderInt);
@@ -186,7 +189,7 @@ public class MyUtil {
 
 
 	// 성별과 주민번호의 enum 클래스
-	private static enum Gender {
+	public static enum Gender {
 		OLDMALE,
 		OLDFEMALE,
 		MALE,

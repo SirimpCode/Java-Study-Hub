@@ -1,5 +1,8 @@
 package my.day15.myinterface.gujikja;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import my.day01.MyUtil;
 import my.day11.inheritance.user.jobseeker.JobSeeker;
 
@@ -40,6 +43,22 @@ public class GujikjaImpl extends CommonMemberAbstract implements Gujikja {
 		return jubun;
 	}
 
+	@Override
+	public void setName(String name) {
+		// == 1. 정규표현식(Regular Expression) 패턴을 작성한다. == //
+		Pattern p = Pattern.compile("^[가-힣]{2,6}$");
+		
+		// == 2. 문자열이 주어진 정규식 패턴과 일치하는지 판별하는 객체를 생성한다. == //
+		Matcher m = p.matcher(name);
+		
+		// == 3. 판별하도록 한다. == //
+		if(m.matches()) {
+			super.setName(name);
+		}
+		else {
+			System.out.println("[경고] 성명은 공백이 없는 한글로만 이루어져야 하며 최소 2글자 이상 최대 6글자로만 되어져야 합니다.\n"); 
+		}
+	}
 
 	// ==== 성별을 구해주는 메소드 생성하기 ====
 	@Override

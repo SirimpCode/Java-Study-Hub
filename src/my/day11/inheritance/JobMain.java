@@ -8,6 +8,8 @@ import my.day11.inheritance.controller.JobSeekerController;
 import my.day11.inheritance.user.CommonMember;
 import my.day11.inheritance.user.company.Company;
 import my.day11.inheritance.user.jobseeker.JobSeeker;
+import my.day15.myinterface.gujikja.CommonMemberAbstract;
+import my.day15.myinterface.gujikja.GujikjaImpl;
 
 public class JobMain {
 

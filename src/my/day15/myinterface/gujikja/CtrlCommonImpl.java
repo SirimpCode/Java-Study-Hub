@@ -11,4 +11,6 @@ public class CtrlCommonImpl implements CtrlCommon {
 		System.out.print("▷ 메뉴번호 선택 : ");
 	}// end of void main_menu()---------------------
 	
+
+	
 }
