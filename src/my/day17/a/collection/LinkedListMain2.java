@@ -1,21 +1,34 @@
 package my.day17.a.collection;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
+
 /*
-== ArrayList == 
-1. 출력시 저장된 순서대로 나온다.
-2. 중복된 데이터를 저장할 수 있다.
-3. 데이터를 읽어오는 속도는 ArrayList 가 LinkedList 보다 상대적으로 빠르다.
-4. 순차적으로 데이터를 추가/삭제하는 경우에는 ArrayList 가 LinkedList 보다 상대적으로 빠르다.
-5. 일반적인 데이터 추가/삭제는 데이터 중간 중간마다 발생하므로 이러한 경우에는 ArrayList 가 LinkedList 보다 상대적으로 느리다.
-6. 결과값은 ArrayList 를 사용하든지 LinkedList 를 사용하든지 동일한 결과값을 가진다.
-7. LinkedList 보다는 ArrayList 를 사용하도록 하자.
-*/
-public class ArrayListMain {
+ == LinkedList == 
+   1. 출력시 저장된 순서대로 나온다.
+   2. 중복된 데이터를 저장할 수 있다.
+   3. 데이터를 읽어오는 속도는 LinkedList 가 ArrayList 보다 상대적으로 느리다.
+   4. 순차적으로 데이터를 추가/삭제하는 경우에는 LinkedList 가  ArrayList 보다 상대적으로 느리다.
+   5. 일반적인 데이터 추가/삭제는 데이터 중간 중간마다 발생하므로 이러한 경우에는 LinkedList 가 ArrayList 보다 상대적으로 빠르다.    
+   6. 결과값은 ArrayList 를 사용하든지 LinkedList 를 사용하든지 동일한 결과값을 가진다.
+   7. LinkedList 보다는 ArrayList 를 사용하도록 하자. 
+   
+   == LinkedList (저장소) ==   
+   
+             유재석(자신의 메모리주소 1372)----(앞서존재하던객체의 메모리주소 1372)엄정화(자신의 메모리주소 3236)----(앞서존재하던객체의 메모리주소 3236)강호동(자신의 메모리주소 1034)----(앞서존재하던객체의 메모리주소 1034)이순신(자신의 메모리주소 2340)---(앞서존재하던객체의 메모리주소 2340)김태희(자신의 메모리주소 5236)   
+   
+   == 엄정화 를 삭제할 경우
+             유재석(자신의 메모리주소 1372)----(앞서존재하던객체의 메모리주소 1372)강호동(자신의 메모리주소 1034)----(앞서존재하던객체의 메모리주소 1034)이순신(자신의 메모리주소 2340)---(앞서존재하던객체의 메모리주소 2340)김태희(자신의 메모리주소 5236)
+       
+   == 엄정화 를 특정 위치에 추가할 경우
+             엄정화(자신의 메모리주소 7876)를 유재석 다음에 추가하고자 한다.
+             유재석(자신의 메모리주소 1372)----(앞서존재하던객체의 메모리주소 1372)엄정화(자신의 메모리주소 7876)----(앞서존재하던객체의 메모리주소 7876)강호동(자신의 메모리주소 1034)----(앞서존재하던객체의 메모리주소 1034)이순신(자신의 메모리주소 2340)---(앞서존재하던객체의 메모리주소 2340)김태희(자신의 메모리주소 5236)
+ */
+public class LinkedListMain2 {
 	public static void main(String[] args) {
-		List<Member> mbrList = new ArrayList<>();
+		List<Member> mbrList = new LinkedList<>();
 		Member member1 = Member.startBuilder().id("youjs").passwd("Qwer1234$").name("유재석").jubun("7209101").build();
 		Member member2 = Member.startBuilder().id("eom").passwd("Qwer1234$").name("엄정화").jubun("6808152").build();
 		Member member3 = Member.startBuilder().id("kanghd").passwd("Qwer1234$").name("강호동").jubun("7006151").build();

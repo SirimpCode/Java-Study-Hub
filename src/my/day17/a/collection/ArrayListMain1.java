@@ -73,6 +73,6 @@ public class ArrayListMain1 {
 		/*포문 바꿔
 		포문 null
 		포문 null*/
-		
+		System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 	}
 }

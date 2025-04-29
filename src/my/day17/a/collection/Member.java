@@ -14,6 +14,12 @@ public class Member {
 		this.name =builder.name;
 		this.jubun =builder.jubun;
 	}
+	public Member(String id, String passwd, String name, String jubun) {
+		this.id = id;
+		this.passwd = passwd;
+		this.name = name;
+		this.jubun = jubun;
+	}
 	public String getId() {
 		return id;
 	}
@@ -57,15 +63,20 @@ public class Member {
 			return new Member(this);
 		}
 	}
+	public void setName(String name) {
+		this.name = name;
+	}
 	
-	@Override
-	public String toString() {
+	public String getInfo() {
 		return "==="+this.name+"님의 회원정보 ===\n"
 				+"1. 아이디 : "+this.id+"\n"
 				+"2. 암호 : "+this.passwd+"\n"
 				+"3. 성명 : "+this.name+"\n"
 				+"4. 성별 : "+getGender()+"\n"
-				+"5. 만나이 : "+MyUtil.getAge(this.jubun)+"\n";
+				+"5. 만나이 : "+getAge()+"\n";
+	}
+	public int getAge() {
+		return MyUtil.getAge(this.jubun);
 	}
 	public String getGender() {
 		Gender gender = MyUtil.createGender(jubun);
@@ -73,6 +84,10 @@ public class Member {
 			case FEMALE,OLDFEMALE -> "여";
 			case MALE,OLDMALE -> "남";
 		};
+	}
+	public void printInfo() {
+		// TODO 자동 생성된 메소드 스텁
+		System.out.println(getInfo());
 	};
 	
 }

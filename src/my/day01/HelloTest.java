@@ -7,7 +7,9 @@ import java.util.Date;
 public class HelloTest {
 
     public static void main(String[] args) {
-        
+        for(Gender gender: Gender.values()) {
+        	System.out.println(gender.getKor());
+        };
         for (int i=0; i<10; i++) {
 //        	System.out.println(i+1+"번 반복");
         	switch(i) {
